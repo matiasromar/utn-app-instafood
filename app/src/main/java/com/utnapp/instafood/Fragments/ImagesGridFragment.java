@@ -1,7 +1,8 @@
 package com.utnapp.instafood.Fragments;
 
+import android.app.Activity;
 import android.content.Context;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,7 +13,9 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.utnapp.instafood.Activities.PublishActivity;
 import com.utnapp.instafood.Adapters.ImageGridAdapter;
+import com.utnapp.instafood.ImagesManager;
 import com.utnapp.instafood.Models.Publication;
 import com.utnapp.instafood.R;
 
@@ -23,6 +26,7 @@ public class ImagesGridFragment extends Fragment {
     
     public static final String VIEW_MIS_PUBLICACIONES = "Mis Publicaciones";
     private static final String VIEW_FEEDS = "Feeds";
+    public static final int RESULT_PUBLISH = 1;
 
     private String viewType;
 
@@ -39,7 +43,6 @@ public class ImagesGridFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -66,21 +69,7 @@ public class ImagesGridFragment extends Fragment {
             }
         }
 
-        loadData();
-    }
-
-    private void loadData() {
-        content = new ArrayList<>();
-
-        Publication publication = new Publication();
-        publication.title = "El tortupato";
-        publication.image = BitmapFactory.decodeResource(getResources(), R.drawable.tortupato);
-        content.add(publication);
-
-        Publication anotherPublication = new Publication();
-        anotherPublication.title = "El Niko";
-        anotherPublication.image = BitmapFactory.decodeResource(getResources(), R.drawable.nikola);
-        content.add(anotherPublication);
+        content = getUpdatedContent();
     }
 
     @Override
@@ -93,6 +82,10 @@ public class ImagesGridFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
+        configureView();
+    }
+
+    private void configureView() {
         View UIerrorMsg = getView().findViewById(R.id.noContent);
         GridView UIgridView = (GridView) getView().findViewById(R.id.gridView);
 
@@ -104,6 +97,13 @@ public class ImagesGridFragment extends Fragment {
         } else {
             UIerrorMsg.setVisibility(TextView.VISIBLE);
             UIgridView.setVisibility(View.GONE);
+        }
+
+        View addBtn = getView().findViewById(R.id.addBtn);
+        if(viewType.equals(VIEW_MIS_PUBLICACIONES)){
+            addBtn.setVisibility(View.VISIBLE);
+        } else {
+            addBtn.setVisibility(View.GONE);
         }
     }
 
@@ -124,7 +124,37 @@ public class ImagesGridFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ImagesGridFragment.RESULT_PUBLISH) {
+            if (resultCode == Activity.RESULT_OK) {
+                Update();
+            }
+        }
+    }
+
+    public void GoToPublish() {
+        Intent intent = new Intent(getActivity(), PublishActivity.class);
+        startActivityForResult(intent, RESULT_PUBLISH);
+    }
+
+    public void Update() {
+        content = getUpdatedContent();
+
+        configureView();
+    }
+
+    private ArrayList<Publication> getUpdatedContent() {
+        if(viewType.endsWith(VIEW_MIS_PUBLICACIONES)){
+            ImagesManager imagesManager = new ImagesManager(getActivity());
+            return imagesManager.getImages();
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
     public interface OnFragmentInteractionListener {
         void showPublication(Publication item);
+        void showAddView(View view);
     }
 }

@@ -12,8 +12,10 @@ import com.utnapp.instafood.R;
 
 public class MainActivity extends AppCompatActivity implements ImagesGridFragment.OnFragmentInteractionListener{
 
+    private static final int RESULT_PUBLISH = 1;
     private View UIinitialView;
     private View UIfragmentContainer;
+    private ImagesGridFragment imagesGridFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,15 +35,22 @@ public class MainActivity extends AppCompatActivity implements ImagesGridFragmen
         UIinitialView.setVisibility(View.GONE);
         UIfragmentContainer.setVisibility(View.VISIBLE);
 
-        ImagesGridFragment imagesGridFragment = ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_MIS_PUBLICACIONES);
+        imagesGridFragment = ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_MIS_PUBLICACIONES);
 
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, imagesGridFragment).commit();
     }
 
     @Override
     public void showPublication(Publication item) {
-        //TODO
+        //TODO showPublication
         Toast toast = Toast.makeText(this, "Pendiente fragment para mostrar imagen", Toast.LENGTH_LONG);
         toast.show();
+    }
+
+    @Override
+    public void showAddView(View view) {
+        if(imagesGridFragment != null){
+            imagesGridFragment.GoToPublish();
+        }
     }
 }

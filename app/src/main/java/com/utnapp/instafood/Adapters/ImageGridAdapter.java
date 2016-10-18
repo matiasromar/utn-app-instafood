@@ -45,9 +45,11 @@ public class ImageGridAdapter extends ArrayAdapter<Publication> {
 
         Publication item = content.get(position);
 
-        holder.imageTitle.setText(item.title);
+        if(holder.imageTitle != null){
+            holder.imageTitle.setText(item.description);
+        }
         holder.image.setImageBitmap(item.image);
-        holder.image.setTag(item.title);
+        holder.image.setTag(item.description);
 
         return row;
     }
