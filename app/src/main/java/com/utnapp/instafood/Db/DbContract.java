@@ -1,4 +1,4 @@
-package com.utnapp.instafood;
+package com.utnapp.instafood.Db;
 
 import android.provider.BaseColumns;
 

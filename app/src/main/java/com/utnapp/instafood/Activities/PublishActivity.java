@@ -20,16 +20,13 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.utnapp.instafood.CommonUtilities;
-import com.utnapp.instafood.ImagesManager;
-import com.utnapp.instafood.Models.Publication;
+import com.utnapp.instafood.Managers.PublicationsManager;
 import com.utnapp.instafood.R;
 
 import java.io.File;
@@ -148,15 +145,6 @@ public class PublishActivity extends AppCompatActivity {
         }
     }
 
-    private void setSelectedPicture() {
-        findViewById(R.id.selectImageContainer).setVisibility(View.GONE);
-        findViewById(R.id.imageSelectedContainer).setVisibility(View.VISIBLE);
-        findViewById(R.id.cancel_edit_button).setVisibility(View.GONE);
-        findViewById(R.id.edit_button).setVisibility(View.VISIBLE);
-        ImageView imageView = (ImageView) findViewById(R.id.selectedImage);
-        imageView.setImageBitmap(selectedImage);
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
@@ -191,8 +179,8 @@ public class PublishActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
     }
 
-    public void Publish(View view) {
-        String description = ((EditText) findViewById(R.id.description)).getText().toString();
+    public void publish(View view) {
+        final String description = ((EditText) findViewById(R.id.description)).getText().toString();
 
         if (selectedImage == null) {
             findViewById(R.id.errorMsg).setVisibility(View.VISIBLE);
@@ -206,18 +194,26 @@ public class PublishActivity extends AppCompatActivity {
             return;
         }
 
-        ImagesManager imagesManager = new ImagesManager(this);
-        imagesManager.saveImage(description, city, selectedImage);
-
-        Intent intent = new Intent();
-        setResult(RESULT_OK, intent);
-        finish();
-    }
-
-    private void requestLocationPermissions() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                MY_PERMISSIONS_REQUEST_LOCATION);
+        final PublicationsManager publicationsManager = new PublicationsManager(this);
+//        publicationsManager.saveImage(description, city, selectedImage, new MyCallback() {
+//            @Override
+//            public void success(String responseBody) {
+                publicationsManager.saveLocally(description, city, selectedImage);
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
+//            }
+//
+//            @Override
+//            public void error(String responseBody) {
+//                Toast.makeText(PublishActivity.this, "Ha ocurrido un error al intentar publicar. Por favor intente nuevamente.", Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void unhandledError(Exception e) {
+//                Toast.makeText(PublishActivity.this, "Ha ocurrido un error al intentar publicar. Por favor intente nuevamente.", Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
     public void selectFromGallery(View view) {
@@ -239,6 +235,34 @@ public class PublishActivity extends AppCompatActivity {
 
         startActivityForResult(intent,
                 CAMERA_REQUEST);
+    }
+
+    public void editPicture(View view) {
+        view.setVisibility(View.GONE);
+        findViewById(R.id.selectImageContainer).setVisibility(View.VISIBLE);
+        findViewById(R.id.cancel_edit_button).setVisibility(View.VISIBLE);
+    }
+
+    public void cancelEditPicture(View view) {
+        view.setVisibility(View.GONE);
+        findViewById(R.id.selectImageContainer).setVisibility(View.GONE);
+        findViewById(R.id.edit_button).setVisibility(View.VISIBLE);
+    }
+
+    private void requestLocationPermissions() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                MY_PERMISSIONS_REQUEST_LOCATION);
+    }
+
+    private void setSelectedPicture() {
+        findViewById(R.id.selectImageContainer).setVisibility(View.GONE);
+        findViewById(R.id.imageSelectedContainer).setVisibility(View.VISIBLE);
+        findViewById(R.id.cancel_edit_button).setVisibility(View.GONE);
+        findViewById(R.id.edit_button).setVisibility(View.VISIBLE);
+        findViewById(R.id.errorMsg).setVisibility(View.GONE);
+        ImageView imageView = (ImageView) findViewById(R.id.selectedImage);
+        imageView.setImageBitmap(selectedImage);
     }
 
     private String getCity(Location location) {
@@ -348,17 +372,5 @@ public class PublishActivity extends AppCompatActivity {
         BitmapFactory.Options o2 = new BitmapFactory.Options();
         o2.inSampleSize = scale;
         return BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri), null, o2);
-    }
-
-    public void editPicture(View view) {
-        view.setVisibility(View.GONE);
-        findViewById(R.id.selectImageContainer).setVisibility(View.VISIBLE);
-        findViewById(R.id.cancel_edit_button).setVisibility(View.VISIBLE);
-    }
-
-    public void cancelEditPicture(View view) {
-        view.setVisibility(View.GONE);
-        findViewById(R.id.selectImageContainer).setVisibility(View.GONE);
-        findViewById(R.id.edit_button).setVisibility(View.VISIBLE);
     }
 }

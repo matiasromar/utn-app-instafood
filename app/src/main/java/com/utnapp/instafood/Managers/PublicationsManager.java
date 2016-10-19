@@ -1,4 +1,4 @@
-package com.utnapp.instafood;
+package com.utnapp.instafood.Managers;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -6,6 +6,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.widget.Toast;
 
+import com.utnapp.instafood.Api.Api;
+import com.utnapp.instafood.Api.MyCallback;
+import com.utnapp.instafood.CommonUtilities;
+import com.utnapp.instafood.Db.DbContract;
+import com.utnapp.instafood.Db.DbHelper;
 import com.utnapp.instafood.Models.Publication;
 
 import java.io.BufferedReader;
@@ -16,14 +21,32 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class ImagesManager {
-    private Context context;
+import okhttp3.Request;
 
-    public ImagesManager(Context context) {
+public class PublicationsManager {
+    private Context context;
+    private Api api;
+
+    public PublicationsManager(Context context) {
         this.context = context;
+        this.api = new Api(context);
     }
 
-    public void saveImage(String description, String city, Bitmap image) {
+    public void saveImage(final String description, final String city, final Bitmap image, MyCallback callback) {
+        //TODO - Definir url
+        String relativeUrl = "TODO";
+        String jsonContent = "{" +
+                    "\"imageBase64\"" + "\"" + CommonUtilities.BitMapToString(image)+ "\"" + "," +
+                    "\"description\"" + "\"" + description + "\"" + "," +
+                    "\"city\"" + "\"" + city + "\"" +
+                "}";
+
+        Request request = api.getPutRequest(relativeUrl, jsonContent, false);
+
+        api.executeSyncCall(request, false, callback);
+    }
+
+    public void saveLocally(String description, String city, Bitmap image) {
         String fileName = UUID.randomUUID().toString();
 
         saveImageToFile(fileName, image);
@@ -40,7 +63,7 @@ public class ImagesManager {
         db.execSQL(insertCmd);
     }
 
-    public ArrayList<Publication> getImages() {
+    public ArrayList<Publication> getLocalImages() {
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 

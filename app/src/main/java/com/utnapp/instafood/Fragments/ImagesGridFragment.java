@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.utnapp.instafood.Activities.PublishActivity;
 import com.utnapp.instafood.Adapters.ImageGridAdapter;
-import com.utnapp.instafood.ImagesManager;
+import com.utnapp.instafood.Managers.PublicationsManager;
 import com.utnapp.instafood.Models.Publication;
 import com.utnapp.instafood.R;
 
@@ -146,9 +146,10 @@ public class ImagesGridFragment extends Fragment {
 
     private ArrayList<Publication> getUpdatedContent() {
         if(viewType.endsWith(VIEW_MIS_PUBLICACIONES)){
-            ImagesManager imagesManager = new ImagesManager(getActivity());
-            return imagesManager.getImages();
+            PublicationsManager publicationsManager = new PublicationsManager(getActivity());
+            return publicationsManager.getLocalImages();
         } else {
+            //TODO get a server para obtener feeds
             return new ArrayList<>();
         }
     }
