@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_publish"
     android:layout_width="match_parent"
@@ -11,44 +11,68 @@
     android:orientation="vertical"
     tools:context="com.utnapp.instafood.Activities.PublishActivity">
 
-    <LinearLayout
-        android:id="@+id/selectImageContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="@dimen/fab_margin"
-        android:layout_gravity="center_horizontal">
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_camera_alt_black_24dp"
-            android:onClick="capturePicture"
-            />
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_image_black_24dp"
-            android:onClick="selectFromGallery"
-            />
-
-    </LinearLayout>
-
     <RelativeLayout
-        android:id="@+id/imageSelectedContainer"
-        android:layout_margin="@dimen/fab_margin"
+        android:id="@+id/imageContainar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone">
-        <ImageView
-        android:id="@+id/selectedImage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/selectImageContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="@dimen/fab_margin"
+            android:elevation="2dp"
+            android:gravity="center">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_camera_alt_black_24dp"
+                android:onClick="capturePicture"
+                />
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_image_black_24dp"
+                android:onClick="selectFromGallery"
+                />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/imageSelectedContainer"
+            android:layout_margin="@dimen/fab_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+            <ImageView
+                android:id="@+id/selectedImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="50dp"
+                android:src="@drawable/ic_image_black_24dp"/>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/edit_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_create_black_24dp"
+                android:layout_alignParentRight="true"
+                android:onClick="editPicture"/>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/cancel_edit_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_clear_black_24dp"
+                android:layout_alignParentRight="true"
+                android:onClick="cancelEditPicture"
+                android:visibility="gone"/>
+        </RelativeLayout>
     </RelativeLayout>
 
     <TextView
         android:id="@+id/errorMsg"
         android:visibility="gone"
+        android:layout_alignBottom="@+id/imageContainar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
@@ -57,13 +81,14 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
         android:layout_margin="@dimen/fab_margin"
         android:orientation="horizontal">
         <EditText
             android:id="@+id/description"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:textSize="20sp"
             android:height="50dp"
             android:layout_marginRight="50dp"/>
@@ -76,4 +101,4 @@
             />
     </FrameLayout>
 
-</LinearLayout>
+</RelativeLayout>
