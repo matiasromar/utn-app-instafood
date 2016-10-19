@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.utnapp.instafood.CommonUtilities;
 import com.utnapp.instafood.ImagesManager;
 import com.utnapp.instafood.Models.Publication;
 import com.utnapp.instafood.R;
@@ -43,10 +44,15 @@ public class PublishActivity extends AppCompatActivity {
     private static final int CAMERA_REQUEST = 2;
 
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 1;
+
     private static final long LENGTH_LONG = 3500;
     private static final long LENGTH_SHORT = 2000;
+
     private static final long MIN_TIME_BW_UPDATES = 1;
     private static final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 50;
+
+    private static final String SAVED_SELECTED_IMAGE_KEY = "SAVED_SELECTED_IMAGE_KEY";
+    private static final String SAVED_CITY_KEY = "SAVED_CITY_KEY";
 
     private Bitmap selectedImage;
     private String city;
@@ -56,7 +62,18 @@ public class PublishActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_publish);
 
-        configureLocationServices();
+        if (savedInstanceState != null) {
+            selectedImage = CommonUtilities.StringToBitMap(savedInstanceState.getString(SAVED_SELECTED_IMAGE_KEY));
+            city = savedInstanceState.getString(SAVED_CITY_KEY);
+        }
+
+        if(selectedImage != null){
+            setSelectedPicture();
+        }
+
+        if(city == null || city.isEmpty()){
+            configureLocationServices();
+        }
     }
 
     @Override
@@ -127,13 +144,17 @@ public class PublishActivity extends AppCompatActivity {
                 }
             }
 
-            findViewById(R.id.selectImageContainer).setVisibility(View.GONE);
-            findViewById(R.id.imageSelectedContainer).setVisibility(View.VISIBLE);
-            findViewById(R.id.cancel_edit_button).setVisibility(View.GONE);
-            findViewById(R.id.edit_button).setVisibility(View.VISIBLE);
-            ImageView imageView = (ImageView) findViewById(R.id.selectedImage);
-            imageView.setImageBitmap(selectedImage);
+            setSelectedPicture();
         }
+    }
+
+    private void setSelectedPicture() {
+        findViewById(R.id.selectImageContainer).setVisibility(View.GONE);
+        findViewById(R.id.imageSelectedContainer).setVisibility(View.VISIBLE);
+        findViewById(R.id.cancel_edit_button).setVisibility(View.GONE);
+        findViewById(R.id.edit_button).setVisibility(View.VISIBLE);
+        ImageView imageView = (ImageView) findViewById(R.id.selectedImage);
+        imageView.setImageBitmap(selectedImage);
     }
 
     @Override
@@ -156,6 +177,18 @@ public class PublishActivity extends AppCompatActivity {
                 break;
             }
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        if(selectedImage != null)
+        {
+            savedInstanceState.putString(SAVED_SELECTED_IMAGE_KEY, CommonUtilities.BitMapToString(selectedImage));
+        }
+        savedInstanceState.putString(SAVED_CITY_KEY, city);
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     public void Publish(View view) {
