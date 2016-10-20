@@ -91,6 +91,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:textSize="20sp"
+            android:hint="Descripción..."
             android:height="50dp"
             android:layout_marginRight="50dp"/>
         <ImageButton

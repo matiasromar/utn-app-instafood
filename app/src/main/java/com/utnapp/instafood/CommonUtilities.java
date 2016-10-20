@@ -7,6 +7,9 @@ import android.util.Base64;
 import java.io.ByteArrayOutputStream;
 
 public class CommonUtilities {
+    public static final long WAIT_LENGTH_LONG = 3500;
+    public static final long WAIT_LENGTH_SHORT = 2000;
+
     public static String BitMapToString(Bitmap image) {
         ByteArrayOutputStream baos=new  ByteArrayOutputStream();
         image.compress(Bitmap.CompressFormat.PNG,100, baos);
