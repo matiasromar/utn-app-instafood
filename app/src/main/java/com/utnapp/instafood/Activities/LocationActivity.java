@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -34,7 +33,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public abstract class LocationActivity extends AppCompatActivity implements
+public abstract class LocationActivity extends BaseActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -52,6 +51,7 @@ public abstract class LocationActivity extends AppCompatActivity implements
     private final int locationRequestPriority;
 
     protected LocationActivity(String locationAccessExplanation, long locationRequestInterval, long locationRequestFastestInterval, int locationRequestPriority) {
+        super(true);
         this.locationAccessExplanation = locationAccessExplanation;
         this.locationRequestInterval = locationRequestInterval;
         this.locationRequestFastestInterval = locationRequestFastestInterval;
@@ -87,13 +87,13 @@ public abstract class LocationActivity extends AppCompatActivity implements
                 requestingLocationUpdates = true;
                 initLocationUpdates();
             } else {
-                finishActivityWithError("Tu ubicación es clave para nuestro servicio, lo sentimos pero no podemos publicar sin ella :( ");
+                finishActivityWithError(getString(R.string.location_key_to_service));
             }
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch (requestCode) {
@@ -102,7 +102,7 @@ public abstract class LocationActivity extends AppCompatActivity implements
                     locationPermissionsGranted = true;
                     initLocationUpdates();
                 } else {
-                    finishActivityWithError("Tu ubicación es clave para nuestro servicio, lo sentimos pero no podemos publicar sin ella :( ");
+                    finishActivityWithError(getString(R.string.location_key_to_service));
                 }
                 break;
             }
@@ -126,7 +126,9 @@ public abstract class LocationActivity extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+        if(googleApiClient.isConnected()){
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+        }
     }
 
     @Override
@@ -149,10 +151,10 @@ public abstract class LocationActivity extends AppCompatActivity implements
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         switch (connectionResult.getErrorCode()){
             case ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED:
-                finishActivityWithError("Google Services debe ser actualizado para poder obtener su ubicación y así poder publicar. Por favor actualice Google Services e intente nuevamente.");
+                finishActivityWithError(getString(R.string.google_serv_need_update));
                 break;
             case ConnectionResult.NETWORK_ERROR:
-                finishActivityWithError("No se ha podido obtener su ubicación por un error de conexión. Por favor revise su conexion a internet.");
+                finishActivityWithError(getString(R.string.check_internet_connection));
                 break;
             default:
                 showToastUnrecognizedLocationError();
@@ -167,7 +169,7 @@ public abstract class LocationActivity extends AppCompatActivity implements
             double longitude = location.getLongitude();
 
             Geocoder gcd = new Geocoder(this, Locale.getDefault());
-            List<Address> addresses = null;
+            List<Address> addresses;
             try {
                 addresses = gcd.getFromLocation(latitude, longitude, 1);
             } catch (IOException e) {
@@ -220,7 +222,7 @@ public abstract class LocationActivity extends AppCompatActivity implements
 
         result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
             @Override
-            public void onResult(LocationSettingsResult result) {
+            public void onResult(@NonNull LocationSettingsResult result) {
                 final Status status = result.getStatus();
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
@@ -252,17 +254,6 @@ public abstract class LocationActivity extends AppCompatActivity implements
     }
 
     private void showToastUnrecognizedLocationError() {
-        finishActivityWithError("No se ha podido obtener su ubicación. Por favor reinicie la aplicación o intente nuevamente más tarde.");
-    }
-
-    private void finishActivityWithError(String error) {
-        Toast.makeText(this, error, Toast.LENGTH_LONG).show();
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                LocationActivity.this.finish();
-            }
-        }, CommonUtilities.WAIT_LENGTH_LONG);
+        finishActivityWithError(getString(R.string.unknown_location_error));
     }
 }

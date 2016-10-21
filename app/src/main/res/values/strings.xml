@@ -16,4 +16,16 @@
         completions."
     </string>
     <string name="api_uri">TODO</string>
+    <string name="custom_item_filter_internet_lost">INTERNET_LOST</string>
+    <string name="internet_connection_needed">Lo sentimos pero para realizar la operación se necesita conexión a internet.</string>
+    <string name="location_key_to_service">"Tu ubicación es clave para nuestro servicio, lo sentimos pero no podemos publicar sin ella :( "</string>
+    <string name="google_serv_need_update">Google Services debe ser actualizado para poder Continuar. Por favor actualice Google Services e intente nuevamente.</string>
+    <string name="check_internet_connection">Ha ocurrido un error. Por favor revise su conexion a internet.</string>
+    <string name="unknown_location_error">No se ha podido obtener su ubicación. Por favor reinicie la aplicación o intente nuevamente más tarde.</string>
+    <string name="select_image">Seleccionar Imagen</string>
+    <string name="error_selecting_image">Hubo un error al seleccionar la imagen</string>
+    <string name="error_capturing_picture">Ha ocurrido un error sacando la foto</string>
+    <string name="no_results">No se encontraron resultados para mostrar</string>
+    <string name="description_placeholder">Descripción...</string>
+    <string name="select_image_to_publish">Por favor seleccione una imagen para poder publicar.</string>
 </resources>

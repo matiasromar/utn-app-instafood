@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.utnapp.instafood.Fragments.ImagesGridFragment">
 
     <TextView
@@ -13,7 +12,7 @@
         android:gravity="center"
         android:textSize="30sp"
         android:visibility="gone"
-        android:text="No se encontraron resultados para mostrar"/>
+        android:text="@string/no_results"/>
 
     <GridView
         android:id="@+id/gridView"

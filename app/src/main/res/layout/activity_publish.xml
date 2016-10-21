@@ -78,7 +78,7 @@
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:gravity="center_horizontal"
         android:textColor="@android:color/holo_red_light"
-        android:text="Por favor seleccione una imagen para poder publicar."/>
+        android:text="@string/select_image_to_publish"/>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -91,7 +91,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:textSize="20sp"
-            android:hint="Descripción..."
+            android:hint="@string/description_placeholder"
             android:height="50dp"
             android:layout_marginRight="50dp"/>
         <ImageButton

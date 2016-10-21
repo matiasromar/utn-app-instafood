@@ -93,7 +93,7 @@ public class PublishActivity extends LocationActivity {
         }
 
         if (city == null) {
-            Toast.makeText(this, "Ha ocurrido un error al obtener su ubicación, por favor intente nuevamente.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.unknown_location_error), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -125,7 +125,7 @@ public class PublishActivity extends LocationActivity {
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
 
-        startActivityForResult(Intent.createChooser(intent, "Seleccionar Imagen"), REQUEST_PICK_IMAGE);
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.select_image)), REQUEST_PICK_IMAGE);
     }
 
     public void capturePicture(View view) {
@@ -161,7 +161,7 @@ public class PublishActivity extends LocationActivity {
                 try {
                     selectedImage = getResizedImage(uri, 500, this);
                 } catch (FileNotFoundException e) {
-                    Toast.makeText(this, "Hubo un error al seleccionar la imagen", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.error_selecting_image, Toast.LENGTH_SHORT).show();
                     return true;
                 }
 
@@ -180,7 +180,7 @@ public class PublishActivity extends LocationActivity {
                 }
 
                 if (!f.exists()) {
-                    Toast.makeText(getBaseContext(), "Ha ocurrido un error sacando la foto", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getBaseContext(), R.string.error_capturing_picture, Toast.LENGTH_LONG).show();
                     return true;
                 }
 
@@ -212,7 +212,7 @@ public class PublishActivity extends LocationActivity {
                     matrix.postRotate(rotate);
                     selectedImage = Bitmap.createBitmap(selectedImage, 0, 0, selectedImage.getWidth(), selectedImage.getHeight(), matrix, true);
                 } catch (Exception e) {
-                    Toast.makeText(this, "Hubo un error al tomar la fotografía", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.error_capturing_picture, Toast.LENGTH_SHORT).show();
                     return true;
                 }
             }
