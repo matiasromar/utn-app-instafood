@@ -33,16 +33,17 @@ public class PublicationsManager {
     }
 
     public void saveImageAsync(final String description, final String city, final Bitmap image, MyCallback callback) {
-        String relativeUrl = "upload-image";
-        String jsonContent = "{" +
-                    "\"imageBase64\":" + "\"" + CommonUtilities.BitMapToString(image)+ "\"" + "," +
-                    //"\"description\":" + "\"" + description + "\"" + "," +
-                    "\"city\":" + "\"" + city + "\"" +
-                "}";
-
-        Request request = api.getPutRequest(relativeUrl, jsonContent, false);
-
-        api.executeAsyncCall(request, false, callback);
+//        String relativeUrl = "upload-image";
+//        String jsonContent = "{" +
+//                    "\"imageBase64\":" + "\"" + CommonUtilities.BitMapToString(image)+ "\"" + "," +
+//                    //"\"description\":" + "\"" + description + "\"" + "," +
+//                    "\"city\":" + "\"" + city + "\"" +
+//                "}";
+//
+//        Request request = api.getPutRequest(relativeUrl, jsonContent, false);
+//
+//        api.executeAsyncCall(request, false, callback);
+        callback.success("");
     }
 
     public void saveLocally(String description, String city, Bitmap image) {
