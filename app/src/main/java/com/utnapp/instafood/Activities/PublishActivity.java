@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationRequest;
+import com.utnapp.instafood.Api.MyCallback;
 import com.utnapp.instafood.CommonUtilities;
 import com.utnapp.instafood.Managers.PublicationsManager;
 import com.utnapp.instafood.R;
@@ -98,25 +99,35 @@ public class PublishActivity extends LocationActivity {
         }
 
         final PublicationsManager publicationsManager = new PublicationsManager(this);
-//        publicationsManager.saveImage(description, city, selectedImage, new MyCallback() {
-//            @Override
-//            public void success(String responseBody) {
-        publicationsManager.saveLocally(description, city, selectedImage);
-        Intent intent = new Intent();
-        setResult(RESULT_OK, intent);
-        finish();
-//            }
-//
-//            @Override
-//            public void error(String responseBody) {
-//                Toast.makeText(PublishActivity.this, "Ha ocurrido un error al intentar publicar. Por favor intente nuevamente.", Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void unhandledError(Exception e) {
-//                Toast.makeText(PublishActivity.this, "Ha ocurrido un error al intentar publicar. Por favor intente nuevamente.", Toast.LENGTH_SHORT).show();
-//            }
-//        });
+        publicationsManager.saveImageAsync(description, city, selectedImage, new MyCallback() {
+            @Override
+            public void success(String responseBody) {
+                publicationsManager.saveLocally(description, city, selectedImage);
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+
+            @Override
+            public void error(String responseBody) {
+                PublishActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(PublishActivity.this, "Ha ocurrido un error al intentar publicar. Por favor intente nuevamente.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void unhandledError(Exception e) {
+                PublishActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(PublishActivity.this, "Ha ocurrido un error al intentar publicar. Por favor intente nuevamente.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
     public void selectFromGallery(View view) {

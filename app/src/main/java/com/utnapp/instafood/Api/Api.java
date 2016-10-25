@@ -24,7 +24,7 @@ public class Api {
         this.context = context;
     }
 
-    private void executeAsyncCall(Request request, Boolean authenticationRequired, final MyCallback callback) {
+    public void executeAsyncCall(Request request, Boolean authenticationRequired, final MyCallback callback) {
         OkHttpClient client = getOkHttpClient(authenticationRequired);
 
         client.newCall(request).enqueue(new Callback() {
@@ -36,10 +36,10 @@ public class Api {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if(response.isSuccessful()){
-                    callback.success(response.body().toString());
+                    callback.success(response.body().string());
                     response.body().close();
                 } else{
-                    callback.error(response.body().toString());
+                    callback.error(response.body().string());
                     response.body().close();
                 }
             }
@@ -128,7 +128,7 @@ public class Api {
         return requestBuilder.build();
     }
 
-    public Request getPutRequest(String jsonContent, String relativeUrl, Boolean authenthicationRequired) {
+    public Request getPutRequest(String relativeUrl, String jsonContent, Boolean authenthicationRequired) {
         final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
         RequestBody body = create(JSON, jsonContent);

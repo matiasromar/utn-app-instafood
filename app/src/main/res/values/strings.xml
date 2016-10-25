@@ -15,7 +15,7 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="api_uri">TODO</string>
+    <string name="api_uri">https://insta-food.herokuapp.com/</string>
     <string name="custom_item_filter_internet_lost">INTERNET_LOST</string>
     <string name="internet_connection_needed">Lo sentimos pero para realizar la operación se necesita conexión a internet.</string>
     <string name="location_key_to_service">"Tu ubicación es clave para nuestro servicio, lo sentimos pero no podemos publicar sin ella :( "</string>

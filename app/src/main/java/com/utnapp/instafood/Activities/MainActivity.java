@@ -35,7 +35,8 @@ public class MainActivity extends AppCompatActivity implements ImagesGridFragmen
         UIinitialView.setVisibility(View.GONE);
         UIfragmentContainer.setVisibility(View.VISIBLE);
 
-        imagesGridFragment = ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_MIS_PUBLICACIONES);
+        //imagesGridFragment = ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_MIS_PUBLICACIONES);
+        imagesGridFragment = ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_FEEDS);
 
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, imagesGridFragment).commit();
     }

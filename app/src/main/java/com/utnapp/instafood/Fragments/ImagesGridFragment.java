@@ -13,19 +13,23 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utnapp.instafood.Activities.PublishActivity;
 import com.utnapp.instafood.Adapters.ImageGridAdapter;
+import com.utnapp.instafood.Api.MyCallback;
 import com.utnapp.instafood.Managers.PublicationsManager;
 import com.utnapp.instafood.Models.Publication;
+import com.utnapp.instafood.JsonModels.PublicationJson;
 import com.utnapp.instafood.R;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class ImagesGridFragment extends Fragment {
     private static final String ARG_PARAM_VIEW = "view";
     
     public static final String VIEW_MIS_PUBLICACIONES = "Mis Publicaciones";
-    private static final String VIEW_FEEDS = "Feeds";
+    public static final String VIEW_FEEDS = "Feeds";
     public static final int RESULT_PUBLISH = 1;
 
     private String viewType;
@@ -69,7 +73,7 @@ public class ImagesGridFragment extends Fragment {
             }
         }
 
-        content = getUpdatedContent();
+        getUpdatedContent();
     }
 
     @Override
@@ -89,7 +93,7 @@ public class ImagesGridFragment extends Fragment {
         View UIerrorMsg = getView().findViewById(R.id.noContent);
         GridView UIgridView = (GridView) getView().findViewById(R.id.gridView);
 
-        if (!content.isEmpty()) {
+        if (content != null && !content.isEmpty()) {
             UIerrorMsg.setVisibility(TextView.GONE);
             UIgridView.setVisibility(TextView.VISIBLE);
 
@@ -139,19 +143,54 @@ public class ImagesGridFragment extends Fragment {
     }
 
     public void Update() {
-        content = getUpdatedContent();
-
-        configureView();
+        getUpdatedContent();
     }
 
-    private ArrayList<Publication> getUpdatedContent() {
+    private void getUpdatedContent() {
+        final PublicationsManager publicationsManager = new PublicationsManager(getActivity());
         if(viewType.endsWith(VIEW_MIS_PUBLICACIONES)){
-            PublicationsManager publicationsManager = new PublicationsManager(getActivity());
-            return publicationsManager.getLocalImages();
+            content = publicationsManager.getLocalImages();
         } else {
-            //TODO get a server para obtener feeds
-            return new ArrayList<>();
+            publicationsManager.getFeedsAsync(new MyCallback() {
+                @Override
+                public void success(String responseBody) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    PublicationJson[] publicationsJsons;
+                    try {
+                        publicationsJsons = mapper.readValue(responseBody, PublicationJson[].class);
+                    } catch (IOException e) {
+                        showErrorShowingContent();
+                        return;
+                    }
+                    content = Publication.Map(publicationsJsons);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            configureView();
+                        }
+                    });
+                }
+
+                @Override
+                public void error(String responseBody) {
+                    showErrorShowingContent();
+                }
+
+                @Override
+                public void unhandledError(Exception e) {
+                    showErrorShowingContent();
+                }
+            });
         }
+    }
+
+    private void showErrorShowingContent() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getActivity(), "Ha ocurrido un error obteniendo los feeds", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public interface OnFragmentInteractionListener {
