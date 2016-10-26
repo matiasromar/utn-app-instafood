@@ -19,8 +19,8 @@ public class Publication {
             Publication publication = new Publication();
             publication.imageId = publicationsJsons[i].imageId;
             publication.image = CommonUtilities.StringToBitMap(publicationsJsons[i].imageBase64);
-            publication.city = "TESTING";
-            publication.description = "TESTING";
+            publication.city = publicationsJsons[i].city;
+            publication.description = publicationsJsons[i].description;
 
             publications.add(publication);
         }

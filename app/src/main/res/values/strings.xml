@@ -28,4 +28,5 @@
     <string name="no_results">No se encontraron resultados para mostrar</string>
     <string name="description_placeholder">Descripción...</string>
     <string name="select_image_to_publish">Por favor seleccione una imagen para poder publicar.</string>
+    <string name="loadingMsg">Cargando...</string>
 </resources>

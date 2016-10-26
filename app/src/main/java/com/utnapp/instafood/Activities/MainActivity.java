@@ -7,15 +7,18 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.utnapp.instafood.Fragments.ImagesGridFragment;
+import com.utnapp.instafood.Fragments.ImagesGridFragment.OnFragmentInteractionListener;
 import com.utnapp.instafood.Models.Publication;
 import com.utnapp.instafood.R;
 
-public class MainActivity extends AppCompatActivity implements ImagesGridFragment.OnFragmentInteractionListener{
-
-    private static final int RESULT_PUBLISH = 1;
+public class MainActivity extends BaseActivity implements OnFragmentInteractionListener{
     private View UIinitialView;
     private View UIfragmentContainer;
     private ImagesGridFragment imagesGridFragment;
+
+    protected MainActivity() {
+        super(false);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +38,7 @@ public class MainActivity extends AppCompatActivity implements ImagesGridFragmen
         UIinitialView.setVisibility(View.GONE);
         UIfragmentContainer.setVisibility(View.VISIBLE);
 
-        //imagesGridFragment = ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_MIS_PUBLICACIONES);
-        imagesGridFragment = ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_FEEDS);
+        imagesGridFragment = ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_FEEDS, "TESTING");
 
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, imagesGridFragment).commit();
     }
@@ -53,5 +55,22 @@ public class MainActivity extends AppCompatActivity implements ImagesGridFragmen
         if(imagesGridFragment != null){
             imagesGridFragment.GoToPublish();
         }
+    }
+
+    @Override
+    public void toggleView(View view) {
+        if(imagesGridFragment != null){
+            imagesGridFragment.toggleView();
+        }
+    }
+
+    @Override
+    public void showLoadingIcon() {
+        super.showLoadingIcon();
+    }
+
+    @Override
+    public void hideLoadingIcon() {
+        super.hideLoadingIcon();
     }
 }

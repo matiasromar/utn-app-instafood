@@ -33,17 +33,16 @@ public class PublicationsManager {
     }
 
     public void saveImageAsync(final String description, final String city, final Bitmap image, MyCallback callback) {
-//        String relativeUrl = "upload-image";
-//        String jsonContent = "{" +
-//                    "\"imageBase64\":" + "\"" + CommonUtilities.BitMapToString(image)+ "\"" + "," +
-//                    //"\"description\":" + "\"" + description + "\"" + "," +
-//                    "\"city\":" + "\"" + city + "\"" +
-//                "}";
-//
-//        Request request = api.getPutRequest(relativeUrl, jsonContent, false);
-//
-//        api.executeAsyncCall(request, false, callback);
-        callback.success("");
+        String relativeUrl = "upload-image";
+        String jsonContent = "{" +
+                    "\"picture\":" + "\"" + CommonUtilities.BitMapToString(image)+ "\"" + "," +
+                    "\"description\":" + "\"" + description + "\"" + "," +
+                    "\"city\":" + "\"" + city + "\"" +
+                "}";
+
+        Request request = api.getPostRequest(relativeUrl, jsonContent, false);
+
+        api.executeAsyncCall(request, false, callback);
     }
 
     public void saveLocally(String description, String city, Bitmap image) {
@@ -145,9 +144,11 @@ public class PublicationsManager {
         }
     }
 
-    public void getFeedsAsync(MyCallback callback) {
-        //TODO Real call
-        String relativeUrl = "get-images?city=TESTING";
+    public void getFeedsAsync(String city, String lastImageId, MyCallback callback) {
+        String relativeUrl = "get-images?city=" + city;
+        if(lastImageId != null && !lastImageId.isEmpty()){
+            relativeUrl += "&lastImageId=" + lastImageId;
+        }
 
         Request request = api.getGetRequest(relativeUrl, false);
 

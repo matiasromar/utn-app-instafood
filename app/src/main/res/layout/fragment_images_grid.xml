@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.utnapp.instafood.Fragments.ImagesGridFragment">
 
     <TextView
@@ -29,14 +30,25 @@
         android:focusable="true"
         android:clickable="true"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/addBtn"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_add_a_photo_black_24dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_margin="@dimen/fab_margin"
-        android:onClick="showAddView"/>
+        android:orientation="horizontal">
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/stat_notify_sync_noanim"
+            android:layout_margin="@dimen/fab_margin"
+            android:onClick="toggleView"/>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/addBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_add_a_photo_black_24dp"
+            android:layout_margin="@dimen/fab_margin"
+            android:onClick="showAddView"/>
+    </LinearLayout>
 
 </RelativeLayout>

@@ -27,12 +27,14 @@ import java.util.ArrayList;
 
 public class ImagesGridFragment extends Fragment {
     private static final String ARG_PARAM_VIEW = "view";
-    
+    private static final String ARG_PARAM_CITY = "City";
+
     public static final String VIEW_MIS_PUBLICACIONES = "Mis Publicaciones";
     public static final String VIEW_FEEDS = "Feeds";
     public static final int RESULT_PUBLISH = 1;
 
     private String viewType;
+    private String city;
 
     private OnFragmentInteractionListener mListener;
     private ArrayList<Publication> content;
@@ -40,10 +42,11 @@ public class ImagesGridFragment extends Fragment {
     public ImagesGridFragment() {
     }
 
-    public static ImagesGridFragment newInstance(String view) {
+    public static ImagesGridFragment newInstance(String view, String city) {
         ImagesGridFragment fragment = new ImagesGridFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM_VIEW, view);
+        args.putString(ARG_PARAM_CITY, city);
         fragment.setArguments(args);
         return fragment;
     }
@@ -67,10 +70,10 @@ public class ImagesGridFragment extends Fragment {
             viewType = getArguments().getString(ARG_PARAM_VIEW);
             
             if(!viewType.equals(VIEW_MIS_PUBLICACIONES) && !viewType.equals(VIEW_FEEDS)){
-                Toast toast = Toast.makeText(getActivity(), "Ha ocurrido un error", Toast.LENGTH_LONG);
-                toast.show();
+                Toast.makeText(getActivity(), "Ha ocurrido un error", Toast.LENGTH_LONG).show();
                 return;
             }
+            city = getArguments().getString(ARG_PARAM_CITY);
         }
 
         getUpdatedContent();
@@ -147,11 +150,14 @@ public class ImagesGridFragment extends Fragment {
     }
 
     private void getUpdatedContent() {
+        mListener.showLoadingIcon();
         final PublicationsManager publicationsManager = new PublicationsManager(getActivity());
         if(viewType.endsWith(VIEW_MIS_PUBLICACIONES)){
             content = publicationsManager.getLocalImages();
+            configureView();
+            mListener.hideLoadingIcon();
         } else {
-            publicationsManager.getFeedsAsync(new MyCallback() {
+            publicationsManager.getFeedsAsync(city, null, new MyCallback() {
                 @Override
                 public void success(String responseBody) {
                     ObjectMapper mapper = new ObjectMapper();
@@ -159,7 +165,12 @@ public class ImagesGridFragment extends Fragment {
                     try {
                         publicationsJsons = mapper.readValue(responseBody, PublicationJson[].class);
                     } catch (IOException e) {
-                        showErrorShowingContent();
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                showErrorShowingContent();
+                            }
+                        });
                         return;
                     }
                     content = Publication.Map(publicationsJsons);
@@ -167,34 +178,54 @@ public class ImagesGridFragment extends Fragment {
                         @Override
                         public void run() {
                             configureView();
+                            mListener.hideLoadingIcon();
                         }
                     });
                 }
 
                 @Override
                 public void error(String responseBody) {
-                    showErrorShowingContent();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mListener.hideLoadingIcon();
+                            showErrorShowingContent();
+                        }
+                    });
                 }
 
                 @Override
                 public void unhandledError(Exception e) {
-                    showErrorShowingContent();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mListener.hideLoadingIcon();
+                            showErrorShowingContent();
+                        }
+                    });
                 }
             });
         }
     }
 
     private void showErrorShowingContent() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getActivity(), "Ha ocurrido un error obteniendo los feeds", Toast.LENGTH_SHORT).show();
-            }
-        });
+        Toast.makeText(getActivity(), "Ha ocurrido un error obteniendo los feeds", Toast.LENGTH_SHORT).show();
+    }
+
+    public void toggleView() {
+        if(viewType.equals(VIEW_MIS_PUBLICACIONES)){
+            viewType = VIEW_FEEDS;
+        } else {
+            viewType = VIEW_MIS_PUBLICACIONES;
+        }
+        getUpdatedContent();
     }
 
     public interface OnFragmentInteractionListener {
         void showPublication(Publication item);
         void showAddView(View view);
+        void toggleView(View view);
+        void hideLoadingIcon();
+        void showLoadingIcon();
     }
 }
