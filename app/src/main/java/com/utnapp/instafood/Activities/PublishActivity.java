@@ -87,10 +87,8 @@ public class PublishActivity extends LocationActivity {
         final String description = ((EditText) findViewById(R.id.description)).getText().toString();
 
         if (selectedImage == null) {
-            findViewById(R.id.errorMsg).setVisibility(View.VISIBLE);
+            Toast.makeText(this, "Por favor seleccione una imagen", Toast.LENGTH_LONG).show();
             return;
-        } else {
-            findViewById(R.id.errorMsg).setVisibility(View.GONE);
         }
 
         if (city == null) {
@@ -238,7 +236,6 @@ public class PublishActivity extends LocationActivity {
         findViewById(R.id.imageSelectedContainer).setVisibility(View.VISIBLE);
         findViewById(R.id.cancel_edit_button).setVisibility(View.GONE);
         findViewById(R.id.edit_button).setVisibility(View.VISIBLE);
-        findViewById(R.id.errorMsg).setVisibility(View.GONE);
         ImageView imageView = (ImageView) findViewById(R.id.selectedImage);
         imageView.setImageBitmap(selectedImage);
     }

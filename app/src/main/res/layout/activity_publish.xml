@@ -28,12 +28,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_camera_alt_black_24dp"
+                android:backgroundTint="@color/colorAccent"
                 android:onClick="capturePicture"
                 />
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_image_black_24dp"
+                android:backgroundTint="@color/colorAccent"
                 android:onClick="selectFromGallery"
                 />
 
@@ -57,6 +59,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_create_black_24dp"
                 android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:onClick="editPicture"/>
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/cancel_edit_button"
@@ -64,21 +67,11 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_clear_black_24dp"
                 android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:onClick="cancelEditPicture"
                 android:visibility="gone"/>
         </RelativeLayout>
     </RelativeLayout>
-
-    <TextView
-        android:id="@+id/errorMsg"
-        android:visibility="gone"
-        android:layout_alignBottom="@+id/imageContainar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:gravity="center_horizontal"
-        android:textColor="@android:color/holo_red_light"
-        android:text="@string/select_image_to_publish"/>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -93,12 +86,14 @@
             android:textSize="20sp"
             android:hint="@string/description_placeholder"
             android:height="50dp"
-            android:layout_marginRight="50dp"/>
+            android:layout_marginEnd="50dp"
+            android:layout_marginRight="50dp" />
         <ImageButton
             android:layout_gravity="right"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:src="@drawable/ic_send_black_24dp"
+            android:backgroundTint="@color/colorAccent"
             android:onClick="publish"
             />
     </FrameLayout>
