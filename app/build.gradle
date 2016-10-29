@@ -12,7 +12,7 @@ android {
         versionName "1.0"
     }
     packagingOptions {
-        pickFirst  'META-INF/LICENSE'
+        pickFirst 'META-INF/LICENSE'
     }
     buildTypes {
         release {
@@ -36,3 +36,6 @@ dependencies {
     compile 'com.google.android.gms:play-services:9.6.1'
     testCompile 'junit:junit:4.12'
 }
+
+
+apply plugin: 'com.google.gms.google-services'

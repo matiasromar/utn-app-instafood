@@ -38,6 +38,7 @@ public class ImagesGridFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private ArrayList<Publication> content;
+    private View mView;
 
     public ImagesGridFragment() {
     }
@@ -75,14 +76,14 @@ public class ImagesGridFragment extends Fragment {
             }
             city = getArguments().getString(ARG_PARAM_CITY);
         }
-
-        getUpdatedContent();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_images_grid, container, false);
+        mView = inflater.inflate(R.layout.fragment_images_grid, container, false);
+        getUpdatedContent();
+        return mView;
     }
 
     @Override
@@ -93,8 +94,8 @@ public class ImagesGridFragment extends Fragment {
     }
 
     private void configureView() {
-        View UIerrorMsg = getView().findViewById(R.id.noContent);
-        GridView UIgridView = (GridView) getView().findViewById(R.id.gridView);
+        View UIerrorMsg = mView.findViewById(R.id.noContent);
+        GridView UIgridView = (GridView) mView.findViewById(R.id.gridView);
 
         if (content != null && !content.isEmpty()) {
             UIerrorMsg.setVisibility(TextView.GONE);
@@ -106,7 +107,7 @@ public class ImagesGridFragment extends Fragment {
             UIgridView.setVisibility(View.GONE);
         }
 
-        View addBtn = getView().findViewById(R.id.addBtn);
+        View addBtn = mView.findViewById(R.id.addBtn);
         if(viewType.equals(VIEW_MIS_PUBLICACIONES)){
             addBtn.setVisibility(View.VISIBLE);
         } else {
