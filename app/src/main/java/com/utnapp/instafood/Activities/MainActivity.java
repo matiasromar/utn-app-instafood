@@ -128,6 +128,11 @@ public class MainActivity extends BaseActivity implements ImagesGridFragment.OnF
     }
 
     @Override
+    public void changeTitle(String viewTitle) {
+        setTitle(viewTitle);
+    }
+
+    @Override
     public void hideLoadingIcon() {
         super.hideLoadingIcon();
     }

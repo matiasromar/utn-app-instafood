@@ -216,8 +216,10 @@ public class ImagesGridFragment extends Fragment {
     public void toggleView() {
         if(viewType.equals(VIEW_MIS_PUBLICACIONES)){
             viewType = VIEW_FEEDS;
+            mListener.changeTitle(VIEW_FEEDS);
         } else {
             viewType = VIEW_MIS_PUBLICACIONES;
+            mListener.changeTitle(VIEW_MIS_PUBLICACIONES);
         }
         getUpdatedContent();
     }
@@ -228,5 +230,6 @@ public class ImagesGridFragment extends Fragment {
         void toggleView(View view);
         void hideLoadingIcon();
         void showLoadingIcon();
+        void changeTitle(String viewTitle);
     }
 }
