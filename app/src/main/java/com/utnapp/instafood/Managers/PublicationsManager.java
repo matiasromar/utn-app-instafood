@@ -146,9 +146,9 @@ public class PublicationsManager {
 
     public void getFeedsAsync(String city, String lastImageId, MyCallback callback) {
         String relativeUrl = "get-images?city=" + city;
-        if(lastImageId != null && !lastImageId.isEmpty()){
-            relativeUrl += "&lastImageId=" + lastImageId;
-        }
+//        if(lastImageId != null && !lastImageId.isEmpty()){
+//            relativeUrl += "&lastImageId=" + lastImageId;
+//        }
 
         Request request = api.getGetRequest(relativeUrl, false);
 
