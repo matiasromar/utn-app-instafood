@@ -1,8 +1,10 @@
 package com.utnapp.instafood.Activities;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -11,7 +13,10 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -34,8 +39,14 @@ public class PublishActivity extends LocationActivity {
     private static final String SAVED_SELECTED_IMAGE_KEY = "SAVED_SELECTED_IMAGE_KEY";
     private static final String SAVED_CITY_KEY = "SAVED_CITY_KEY";
 
+    private static final int MY_PERMISSIONS_REQUEST_STORAGE = 1;
+
+    private final String storageAccessExplanation = "Instafood necesita acceso a su almacenamiento para poder publicar la imagen seleccionada.";
+
     private Bitmap selectedImage;
     private String city;
+    private boolean storagePermissionsGranted = false;
+
 
     protected PublishActivity() {
         super(
@@ -50,6 +61,23 @@ public class PublishActivity extends LocationActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_publish);
+
+        if (!storagePermissionsGranted && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                Toast.makeText(this, storageAccessExplanation, Toast.LENGTH_LONG).show();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        requestStoragePermissions();
+                    }
+                }, CommonUtilities.WAIT_LENGTH_LONG);
+            } else {
+                requestStoragePermissions();
+            }
+        } else {
+            storagePermissionsGranted = true;
+        }
 
         if (savedInstanceState != null) {
             selectedImage = CommonUtilities.StringToBitMap(savedInstanceState.getString(SAVED_SELECTED_IMAGE_KEY));
@@ -83,7 +111,24 @@ public class PublishActivity extends LocationActivity {
         city = getCity(location);
     }
 
-    public void publish(View view) {
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    storagePermissionsGranted = true;
+                } else {
+                    finishActivityWithError(getString(R.string.storage_key_to_service));
+                }
+                break;
+            }
+        }
+    }
+
+    public void publish(final View view) {
+        view.setEnabled(false);
         final String description = ((EditText) findViewById(R.id.description)).getText().toString();
 
         if (selectedImage == null) {
@@ -97,6 +142,7 @@ public class PublishActivity extends LocationActivity {
         }
 
         final PublicationsManager publicationsManager = new PublicationsManager(this);
+        this.showLoadingIcon();
         publicationsManager.saveImageAsync(description, city, selectedImage, new MyCallback() {
             @Override
             public void success(String responseBody) {
@@ -111,6 +157,8 @@ public class PublishActivity extends LocationActivity {
                 PublishActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        PublishActivity.this.hideLoadingIcon();
+                        view.setEnabled(true);
                         Toast.makeText(PublishActivity.this, "Ha ocurrido un error al intentar publicar. Por favor intente nuevamente.", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -121,6 +169,8 @@ public class PublishActivity extends LocationActivity {
                 PublishActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        PublishActivity.this.hideLoadingIcon();
+                        view.setEnabled(true);
                         Toast.makeText(PublishActivity.this, "Ha ocurrido un error al intentar publicar. Por favor intente nuevamente.", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -168,14 +218,16 @@ public class PublishActivity extends LocationActivity {
                 Uri uri = data.getData();
 
                 try {
-                    selectedImage = getResizedImage(uri, 500, this);
+                    selectedImage = getResizedImage(uri, 200, this);
                 } catch (FileNotFoundException e) {
                     Toast.makeText(this, R.string.error_selecting_image, Toast.LENGTH_SHORT).show();
                     return true;
                 }
 
-                ImageView imageView = (ImageView) findViewById(R.id.selectedImage);
-                imageView.setImageBitmap(selectedImage);
+                if(selectedImage != null){
+                    ImageView imageView = (ImageView) findViewById(R.id.selectedImage);
+                    imageView.setImageBitmap(selectedImage);
+                }
             }
 
             if (requestCode == REQUEST_CAMERA) {
@@ -194,32 +246,34 @@ public class PublishActivity extends LocationActivity {
                 }
 
                 try {
-                    selectedImage = getResizedImage(Uri.fromFile(f), 500, this);
+                    selectedImage = getResizedImage(Uri.fromFile(f), 200, this);
 
-                    int rotate = 0;
-                    try {
-                        ExifInterface exif = new ExifInterface(f.getAbsolutePath());
-                        int orientation = exif.getAttributeInt(
-                                ExifInterface.TAG_ORIENTATION,
-                                ExifInterface.ORIENTATION_NORMAL);
+                    if(selectedImage != null){
+                        int rotate = 0;
+                        try {
+                            ExifInterface exif = new ExifInterface(f.getAbsolutePath());
+                            int orientation = exif.getAttributeInt(
+                                    ExifInterface.TAG_ORIENTATION,
+                                    ExifInterface.ORIENTATION_NORMAL);
 
-                        switch (orientation) {
-                            case ExifInterface.ORIENTATION_ROTATE_270:
-                                rotate = 270;
-                                break;
-                            case ExifInterface.ORIENTATION_ROTATE_180:
-                                rotate = 180;
-                                break;
-                            case ExifInterface.ORIENTATION_ROTATE_90:
-                                rotate = 90;
-                                break;
+                            switch (orientation) {
+                                case ExifInterface.ORIENTATION_ROTATE_270:
+                                    rotate = 270;
+                                    break;
+                                case ExifInterface.ORIENTATION_ROTATE_180:
+                                    rotate = 180;
+                                    break;
+                                case ExifInterface.ORIENTATION_ROTATE_90:
+                                    rotate = 90;
+                                    break;
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        Matrix matrix = new Matrix();
+                        matrix.postRotate(rotate);
+                        selectedImage = Bitmap.createBitmap(selectedImage, 0, 0, selectedImage.getWidth(), selectedImage.getHeight(), matrix, true);
                     }
-                    Matrix matrix = new Matrix();
-                    matrix.postRotate(rotate);
-                    selectedImage = Bitmap.createBitmap(selectedImage, 0, 0, selectedImage.getWidth(), selectedImage.getHeight(), matrix, true);
                 } catch (Exception e) {
                     Toast.makeText(this, R.string.error_capturing_picture, Toast.LENGTH_SHORT).show();
                     return true;
@@ -241,6 +295,11 @@ public class PublishActivity extends LocationActivity {
     }
 
     private Bitmap getResizedImage(Uri uri, int requiredSize, Context context) throws FileNotFoundException {
+        if(!storagePermissionsGranted){
+            Toast.makeText(this, storageAccessExplanation, Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inJustDecodeBounds = true;
         BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri), null, o);
@@ -262,5 +321,11 @@ public class PublishActivity extends LocationActivity {
         BitmapFactory.Options o2 = new BitmapFactory.Options();
         o2.inSampleSize = scale;
         return BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri), null, o2);
+    }
+
+    private void requestStoragePermissions() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                MY_PERMISSIONS_REQUEST_STORAGE);
     }
 }

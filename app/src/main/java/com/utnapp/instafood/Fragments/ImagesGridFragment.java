@@ -169,7 +169,7 @@ public class ImagesGridFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                showErrorShowingContent();
+                            showErrorShowingContent();
                             }
                         });
                         return;
@@ -178,8 +178,8 @@ public class ImagesGridFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            configureView();
-                            mListener.hideLoadingIcon();
+                        configureView();
+                        mListener.hideLoadingIcon();
                         }
                     });
                 }
@@ -189,8 +189,8 @@ public class ImagesGridFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mListener.hideLoadingIcon();
-                            showErrorShowingContent();
+                        mListener.hideLoadingIcon();
+                        showErrorShowingContent();
                         }
                     });
                 }
@@ -200,8 +200,8 @@ public class ImagesGridFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mListener.hideLoadingIcon();
-                            showErrorShowingContent();
+                        mListener.hideLoadingIcon();
+                        showErrorShowingContent();
                         }
                     });
                 }
@@ -211,6 +211,7 @@ public class ImagesGridFragment extends Fragment {
 
     private void showErrorShowingContent() {
         Toast.makeText(getActivity(), "Ha ocurrido un error obteniendo los feeds", Toast.LENGTH_SHORT).show();
+        toggleView();
     }
 
     public void toggleView() {

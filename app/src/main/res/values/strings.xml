@@ -33,4 +33,5 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="prefKey_UserSharedPreferences">INSTAFOOD_PREFS</string>
+    <string name="storage_key_to_service">Lo sentimos pero sin acceso al almacenamiento la funcionalidad no está disponible.</string>
 </resources>
