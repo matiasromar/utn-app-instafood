@@ -2,6 +2,7 @@ package com.utnapp.instafood.Activities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -13,6 +14,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -33,7 +35,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public abstract class LocationActivity extends BaseActivity implements
+public abstract class LocationActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -49,6 +51,7 @@ public abstract class LocationActivity extends BaseActivity implements
     private final long locationRequestInterval;
     private final long locationRequestFastestInterval;
     private final int locationRequestPriority;
+    private ProgressDialog progress;
 
     protected LocationActivity(String locationAccessExplanation, long locationRequestInterval, long locationRequestFastestInterval, int locationRequestPriority) {
         this.locationAccessExplanation = locationAccessExplanation;
@@ -254,5 +257,31 @@ public abstract class LocationActivity extends BaseActivity implements
 
     private void showToastUnrecognizedLocationError() {
         finishActivityWithError(getString(R.string.unknown_location_error));
+    }
+
+    public void finishActivityWithError(String error) {
+        Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                LocationActivity.this.finish();
+            }
+        }, CommonUtilities.WAIT_LENGTH_LONG);
+    }
+
+    protected void showLoadingIcon() {
+        if(progress == null){
+            progress = new ProgressDialog(this);
+        }
+        progress.setTitle("");
+        progress.setMessage(getString(R.string.loadingMsg));
+        progress.show();
+    }
+
+    protected void hideLoadingIcon() {
+        if(progress != null){
+            progress.dismiss();
+        }
     }
 }

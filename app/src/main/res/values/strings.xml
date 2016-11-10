@@ -1,8 +1,10 @@
 <resources>
+    <!-- SHARED ACROSS APP -->
     <string name="app_name">Instafood</string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="api_uri">https://insta-food.herokuapp.com/</string>
 
     <!-- Strings related to login -->
+    <string name="title_activity_login">Sign in</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_up">Registrarse</string>
@@ -15,23 +17,33 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="api_uri">https://insta-food.herokuapp.com/</string>
+
+    <!-- CUSTOM INTENT FILTERS -->
     <string name="custom_item_filter_internet_lost">INTERNET_LOST</string>
-    <string name="internet_connection_needed">Lo sentimos pero para realizar la operación se necesita conexión a internet.</string>
+
+    <!-- DESCRIPTIONS -->
     <string name="location_key_to_service">"Tu ubicación es clave para nuestro servicio, lo sentimos pero no podemos publicar sin ella :( "</string>
+    <string name="internet_connection_needed">Lo sentimos pero para realizar la operación se necesita conexión a internet.</string>
     <string name="google_serv_need_update">Google Services debe ser actualizado para poder Continuar. Por favor actualice Google Services e intente nuevamente.</string>
     <string name="check_internet_connection">Ha ocurrido un error. Por favor revise su conexion a internet.</string>
     <string name="unknown_location_error">No se ha podido obtener su ubicación. Por favor reinicie la aplicación o intente nuevamente más tarde.</string>
-    <string name="select_image">Seleccionar Imagen</string>
-    <string name="error_selecting_image">Hubo un error al seleccionar la imagen</string>
     <string name="error_capturing_picture">Ha ocurrido un error sacando la foto</string>
+    <string name="error_selecting_image">Hubo un error al seleccionar la imagen</string>
+    <string name="storage_key_to_service">Lo sentimos pero sin acceso al almacenamiento la funcionalidad no está disponible.</string>
+
+    <!-- TRADUCTIONS -->
+    <string name="select_image">Seleccionar Imagen</string>
     <string name="no_results">No se encontraron resultados para mostrar</string>
     <string name="description_placeholder">Descripción...</string>
     <string name="select_image_to_publish">Por favor seleccione una imagen para poder publicar.</string>
     <string name="loadingMsg">Cargando...</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- PREFS -->
     <string name="prefKey_UserSharedPreferences">INSTAFOOD_PREFS</string>
-    <string name="storage_key_to_service">Lo sentimos pero sin acceso al almacenamiento la funcionalidad no está disponible.</string>
+
+    <!-- DRAWER -->
+    <string name="navigation_drawer_open">Abrir navegación</string>
+    <string name="navigation_drawer_close">Cerrar navegación</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="login">Ingresar</string>
 </resources>
