@@ -17,8 +17,8 @@ public class Publication {
         ArrayList<Publication> publications = new ArrayList<>();
         for(int i = 0; i < publicationsJsons.length; i++){
             Publication publication = new Publication();
-            publication.imageId = publicationsJsons[i].imageId;
-            publication.image = CommonUtilities.StringToBitMap(publicationsJsons[i].imageBase64);
+            publication.imageId = publicationsJsons[i]._id;
+            publication.image = CommonUtilities.StringToBitMap(publicationsJsons[i].img_base64);
             publication.city = publicationsJsons[i].city;
             publication.description = publicationsJsons[i].description;
 

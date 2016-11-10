@@ -260,7 +260,9 @@ public class MainActivity extends LocationActivity
     //Location Activity
     @Override
     public void onLocationChanged(Location location) {
-        publishFragment.updateCity(getCity(location));
+        if(publishFragment != null){
+            publishFragment.updateCity(getCity(location));
+        }
     }
     //END - Location Activity
 
