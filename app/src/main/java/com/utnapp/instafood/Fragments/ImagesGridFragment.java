@@ -14,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.utnapp.instafood.Activities.PublishActivity;
 import com.utnapp.instafood.Adapters.ImageGridAdapter;
 import com.utnapp.instafood.Api.MyCallback;
 import com.utnapp.instafood.Managers.PublicationsManager;
@@ -130,24 +129,6 @@ public class ImagesGridFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ImagesGridFragment.RESULT_PUBLISH) {
-            if (resultCode == Activity.RESULT_OK) {
-                Update();
-            }
-        }
-    }
-
-    public void GoToPublish() {
-        Intent intent = new Intent(getActivity(), PublishActivity.class);
-        startActivityForResult(intent, RESULT_PUBLISH);
-    }
-
-    public void Update() {
-        getUpdatedContent();
     }
 
     private void getUpdatedContent() {
