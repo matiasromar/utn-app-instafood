@@ -107,11 +107,6 @@ public class PublishActivity extends LocationActivity {
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-        city = getCity(location);
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
@@ -126,6 +121,13 @@ public class PublishActivity extends LocationActivity {
             }
         }
     }
+
+    //Location Activity
+    @Override
+    public void onLocationChanged(Location location) {
+        city = getCity(location);
+    }
+    //END - Location Activity
 
     public void publish(final View view) {
         view.setEnabled(false);

@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -52,7 +51,6 @@ public abstract class LocationActivity extends BaseActivity implements
     private final int locationRequestPriority;
 
     protected LocationActivity(String locationAccessExplanation, long locationRequestInterval, long locationRequestFastestInterval, int locationRequestPriority) {
-        super(true);
         this.locationAccessExplanation = locationAccessExplanation;
         this.locationRequestInterval = locationRequestInterval;
         this.locationRequestFastestInterval = locationRequestFastestInterval;

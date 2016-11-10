@@ -19,10 +19,6 @@ public class MainActivity extends BaseActivity implements ImagesGridFragment.OnF
     private View UIfragmentContainer;
     private ImagesGridFragment imagesGridFragment;
 
-    protected MainActivity() {
-        super(false);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

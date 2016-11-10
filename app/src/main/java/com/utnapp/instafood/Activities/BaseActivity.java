@@ -15,51 +15,7 @@ import com.utnapp.instafood.R;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    private final Boolean internetRequired;
     private ProgressDialog progress;
-
-    protected BaseActivity(Boolean internetRequired) {
-        super();
-        this.internetRequired = internetRequired;
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (!CommonUtilities.isNetworkAvailable(this) && this.internetRequired) {
-            showNoConnectionErrorAndFinish();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        registerReceiver(connectionLostReceiver, new IntentFilter(getString(R.string.custom_item_filter_internet_lost)));
-    }
-
-    @Override
-    protected void onStop() {
-        unregisterReceiver(connectionLostReceiver);
-
-        super.onStop();
-    }
-
-    BroadcastReceiver connectionLostReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            boolean internetConnectionRequired = internetRequired;
-
-            if(internetConnectionRequired){
-                showNoConnectionErrorAndFinish();
-            }
-        }
-    };
-
-    private void showNoConnectionErrorAndFinish() {
-        finishActivityWithError(getString(R.string.internet_connection_needed));
-    }
 
     protected void finishActivityWithError(String error) {
         Toast.makeText(this, error, Toast.LENGTH_LONG).show();
