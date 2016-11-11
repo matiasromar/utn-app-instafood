@@ -88,7 +88,6 @@ public class ImagesGridFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
         configureView();
     }
 
@@ -202,6 +201,17 @@ public class ImagesGridFragment extends Fragment {
         } else {
             viewType = VIEW_MIS_PUBLICACIONES;
             mListener.changeTitle(VIEW_MIS_PUBLICACIONES);
+        }
+        getUpdatedContent();
+    }
+
+    public void UpdateContent(String view) {
+        if(view.equals(VIEW_MIS_PUBLICACIONES)){
+            viewType = VIEW_MIS_PUBLICACIONES;
+            mListener.changeTitle(VIEW_MIS_PUBLICACIONES);
+        } else {
+            viewType = VIEW_FEEDS;
+            mListener.changeTitle(VIEW_FEEDS);
         }
         getUpdatedContent();
     }

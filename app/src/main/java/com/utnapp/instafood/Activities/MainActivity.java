@@ -43,7 +43,6 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.utnapp.instafood.CommonUtilities;
 import com.utnapp.instafood.Fragments.ImagesGridFragment;
-import com.utnapp.instafood.Fragments.LoginFragment;
 import com.utnapp.instafood.Fragments.PublishFragment;
 import com.utnapp.instafood.Models.Publication;
 import com.utnapp.instafood.R;
@@ -54,7 +53,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ImagesGridFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener, PublishFragment.OnFragmentInteractionListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+        implements NavigationView.OnNavigationItemSelectedListener, ImagesGridFragment.OnFragmentInteractionListener, PublishFragment.OnFragmentInteractionListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private boolean requestingLocationUpdates = false;
     private boolean locationPermissionsGranted = false;
@@ -120,6 +119,11 @@ public class MainActivity extends AppCompatActivity
     public void onResume() {
         super.onResume();
         initLocationUpdates();
+
+        configureDrawer();
+
+        //TODO - Para cdo estar logueado o no haga alguna diferencia
+        // imagesGridFragment.UpdateContent(ImagesGridFragment.VIEW_MIS_PUBLICACIONES);
     }
 
     @Override
@@ -219,11 +223,8 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_login) {
-            LoginFragment fragment = LoginFragment.newInstance();
-            android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
-                    .commit();
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            MainActivity.this.startActivity(intent);
         } else if (id == R.id.nav_logout) {
             SharedPreferences sharedPref = getSharedPreferences(this.getString(R.string.prefKey_UserSharedPreferences), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
@@ -269,6 +270,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(Location location) {
+        this.hideLoadingIcon();
         currentCity = getCity(location);
         if(currentCity != null && !currentCity.isEmpty()){
             googleApiClient.disconnect();
@@ -291,7 +293,12 @@ public class MainActivity extends AppCompatActivity
             publishFragment = PublishFragment.newInstance(currentCity);
             android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, publishFragment)
+                    .hide(imagesGridFragment)
+                    .commit();
+
+            fragmentManager.beginTransaction()
+                    .add(R.id.fragment_container, publishFragment)
+                    .addToBackStack(null)
                     .commit();
         }
     }
@@ -308,16 +315,6 @@ public class MainActivity extends AppCompatActivity
         setTitle(viewTitle);
     }
     //END_REGION: ImagesGridFragment.OnFragmentInteractionListener
-
-    //REGION: LoginFragment.OnFragmentInteractionListener
-    @Override
-    public void finishLogin() {
-        configureDrawer();
-        setTitle(ImagesGridFragment.VIEW_MIS_PUBLICACIONES);
-        imagesGridFragment = ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_MIS_PUBLICACIONES, currentCity);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, imagesGridFragment).commit();
-    }
-    //END_REGION: LoginFragment.OnFragmentInteractionListener
 
     //REGION: PublishFragment.OnFragmentInteractionListener
     @Override
@@ -367,11 +364,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void finishPublish() {
-        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, imagesGridFragment)
+        getSupportFragmentManager().beginTransaction()
+                .show(imagesGridFragment)
+                .remove(publishFragment)
                 .commit();
-
         publishFragment = null;
     }
     //END_REGION: PublishFragment.OnFragmentInteractionListener
@@ -512,6 +508,7 @@ public class MainActivity extends AppCompatActivity
 
     private void initLocationUpdates() {
         if(googleApiClient != null && googleApiClient.isConnected() && locationRequest != null && locationPermissionsGranted && requestingLocationUpdates){
+            this.showLoadingIcon();
             //noinspection MissingPermission
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         }

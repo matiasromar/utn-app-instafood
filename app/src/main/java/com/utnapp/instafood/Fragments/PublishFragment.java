@@ -113,6 +113,7 @@ public class PublishFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        mListener.finishPublish();
         mListener = null;
     }
 
