@@ -118,7 +118,7 @@ public class ImagesGridFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        void showPublication(Publication item);
+        void showPublication(Publication item, boolean allowLike);
         void showAddView(View view);
         void toggleView(View view);
         void hideLoadingIcon();
@@ -154,11 +154,13 @@ public class ImagesGridFragment extends Fragment {
         UIgridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 Publication item = (Publication) parent.getItemAtPosition(position);
-                mListener.showPublication(item);
-                if(v.findViewById(R.id.like).getVisibility() == View.VISIBLE){
-                    v.findViewById(R.id.like).setVisibility(View.GONE);
-                } else {
-                    v.findViewById(R.id.like).setVisibility(View.VISIBLE);
+                mListener.showPublication(item, viewType == VIEW_FEEDS);
+                if(viewType == VIEW_FEEDS){
+                    if(v.findViewById(R.id.like).getVisibility() == View.VISIBLE){
+                        v.findViewById(R.id.like).setVisibility(View.GONE);
+                    } else {
+                        v.findViewById(R.id.like).setVisibility(View.VISIBLE);
+                    }
                 }
             }
         });

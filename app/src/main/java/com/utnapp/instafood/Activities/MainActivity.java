@@ -41,7 +41,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.utnapp.instafood.Api.MyCallback;
 import com.utnapp.instafood.CommonUtilities;
 import com.utnapp.instafood.Fragments.ImagesGridFragment;
 import com.utnapp.instafood.Fragments.PublishFragment;
@@ -287,18 +286,18 @@ public class MainActivity extends AppCompatActivity
 
     //REGION: ImagesGridFragment.OnFragmentInteractionListener
     @Override
-    public void showPublication(Publication item) {
+    public void showPublication(Publication item, boolean allowLike) {
         //TODO showPublication
-        Toast toast = Toast.makeText(this, "Pendiente fragment para mostrar imagen - Like/NoLike por ahora", Toast.LENGTH_LONG);
-        toast.show();
-        //TODO Migrar esto al fragment de Imagen en pantalla completa cdo este terminado
-        LikesManager likesManager = new LikesManager(this);
-        if(item.liked){
-            likesManager.removeLike(item.id);
-            item.liked = false;
-        } else {
-            likesManager.addLike(item.id);
-            item.liked = true;
+        if(allowLike){
+            //TODO Migrar esto al fragment de Imagen en pantalla completa cdo este terminado
+            LikesManager likesManager = new LikesManager(this);
+            if(item.liked){
+                likesManager.removeLike(item.id);
+                item.liked = false;
+            } else {
+                likesManager.addLike(item.id);
+                item.liked = true;
+            }
         }
     }
 
