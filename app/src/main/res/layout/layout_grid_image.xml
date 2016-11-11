@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginTop="5dp"
@@ -8,9 +8,15 @@
     android:padding="5dp">
 
     <ImageView
+        android:id="@+id/like"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_favorite_black_24dp"/>
+
+    <ImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="110dp"
         android:contentDescription="Imagen"/>
 
-</LinearLayout>
+</RelativeLayout>

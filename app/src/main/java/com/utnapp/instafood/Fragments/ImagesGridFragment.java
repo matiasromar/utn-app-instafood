@@ -30,7 +30,6 @@ public class ImagesGridFragment extends Fragment {
 
     public static final String VIEW_MIS_PUBLICACIONES = "Mis Publicaciones";
     public static final String VIEW_FEEDS = "Feeds";
-    public static final int RESULT_PUBLISH = 1;
 
     private String viewType;
     private String city;
@@ -78,8 +77,7 @@ public class ImagesGridFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_images_grid, container, false);
         getUpdatedContent();
         return mView;
@@ -89,6 +87,43 @@ public class ImagesGridFragment extends Fragment {
     public void onResume() {
         super.onResume();
         configureView();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    public void toggleView() {
+        if(viewType.equals(VIEW_MIS_PUBLICACIONES)){
+            viewType = VIEW_FEEDS;
+            mListener.changeTitle(VIEW_FEEDS);
+        } else {
+            viewType = VIEW_MIS_PUBLICACIONES;
+            mListener.changeTitle(VIEW_MIS_PUBLICACIONES);
+        }
+        getUpdatedContent();
+    }
+
+    public void UpdateContent(String view) {
+        if(view.equals(VIEW_MIS_PUBLICACIONES)){
+            viewType = VIEW_MIS_PUBLICACIONES;
+            mListener.changeTitle(VIEW_MIS_PUBLICACIONES);
+        } else {
+            viewType = VIEW_FEEDS;
+            mListener.changeTitle(VIEW_FEEDS);
+        }
+        getUpdatedContent();
+    }
+
+    public interface OnFragmentInteractionListener {
+        void showPublication(Publication item);
+        void showAddView(View view);
+        void toggleView(View view);
+        void hideLoadingIcon();
+        void showLoadingIcon();
+        void changeTitle(String viewTitle);
     }
 
     private void configureView() {
@@ -120,14 +155,13 @@ public class ImagesGridFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 Publication item = (Publication) parent.getItemAtPosition(position);
                 mListener.showPublication(item);
+                if(v.findViewById(R.id.like).getVisibility() == View.VISIBLE){
+                    v.findViewById(R.id.like).setVisibility(View.GONE);
+                } else {
+                    v.findViewById(R.id.like).setVisibility(View.VISIBLE);
+                }
             }
         });
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     private void getUpdatedContent() {
@@ -154,7 +188,7 @@ public class ImagesGridFragment extends Fragment {
                         });
                         return;
                     }
-                    content = Publication.Map(publicationsJsons);
+                    content = Publication.Map(publicationsJsons, getActivity());
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -192,36 +226,5 @@ public class ImagesGridFragment extends Fragment {
     private void showErrorShowingContent() {
         Toast.makeText(getActivity(), "Ha ocurrido un error obteniendo los feeds", Toast.LENGTH_SHORT).show();
         toggleView();
-    }
-
-    public void toggleView() {
-        if(viewType.equals(VIEW_MIS_PUBLICACIONES)){
-            viewType = VIEW_FEEDS;
-            mListener.changeTitle(VIEW_FEEDS);
-        } else {
-            viewType = VIEW_MIS_PUBLICACIONES;
-            mListener.changeTitle(VIEW_MIS_PUBLICACIONES);
-        }
-        getUpdatedContent();
-    }
-
-    public void UpdateContent(String view) {
-        if(view.equals(VIEW_MIS_PUBLICACIONES)){
-            viewType = VIEW_MIS_PUBLICACIONES;
-            mListener.changeTitle(VIEW_MIS_PUBLICACIONES);
-        } else {
-            viewType = VIEW_FEEDS;
-            mListener.changeTitle(VIEW_FEEDS);
-        }
-        getUpdatedContent();
-    }
-
-    public interface OnFragmentInteractionListener {
-        void showPublication(Publication item);
-        void showAddView(View view);
-        void toggleView(View view);
-        void hideLoadingIcon();
-        void showLoadingIcon();
-        void changeTitle(String viewTitle);
     }
 }

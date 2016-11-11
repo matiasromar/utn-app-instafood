@@ -38,6 +38,7 @@ public class ImageGridAdapter extends ArrayAdapter<Publication> {
             holder = new ViewHolder();
             holder.imageTitle = (TextView) row.findViewById(R.id.text);
             holder.image = (ImageView) row.findViewById(R.id.image);
+            holder.like = row.findViewById(R.id.like);
             row.setTag(holder);
         } else {
             holder = (ViewHolder) row.getTag();
@@ -50,6 +51,11 @@ public class ImageGridAdapter extends ArrayAdapter<Publication> {
         }
         holder.image.setImageBitmap(item.image);
         holder.image.setTag(item.description);
+        if(item.liked){
+            holder.like.setVisibility(View.VISIBLE);
+        } else {
+            holder.like.setVisibility(View.GONE);
+        }
 
         return row;
     }
@@ -57,5 +63,6 @@ public class ImageGridAdapter extends ArrayAdapter<Publication> {
     static class ViewHolder {
         TextView imageTitle;
         ImageView image;
+        View like;
     }
 }

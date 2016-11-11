@@ -60,6 +60,8 @@ public class PublicationsManager {
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.execSQL(insertCmd);
+        db.close();
+        dbHelper.close();
     }
 
     public ArrayList<Publication> getLocalImages() {

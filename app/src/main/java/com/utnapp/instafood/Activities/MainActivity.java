@@ -45,6 +45,7 @@ import com.utnapp.instafood.Api.MyCallback;
 import com.utnapp.instafood.CommonUtilities;
 import com.utnapp.instafood.Fragments.ImagesGridFragment;
 import com.utnapp.instafood.Fragments.PublishFragment;
+import com.utnapp.instafood.Managers.LikesManager;
 import com.utnapp.instafood.Managers.PublicationsManager;
 import com.utnapp.instafood.Models.Publication;
 import com.utnapp.instafood.R;
@@ -288,8 +289,17 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void showPublication(Publication item) {
         //TODO showPublication
-        Toast toast = Toast.makeText(this, "Pendiente fragment para mostrar imagen", Toast.LENGTH_LONG);
+        Toast toast = Toast.makeText(this, "Pendiente fragment para mostrar imagen - Like/NoLike por ahora", Toast.LENGTH_LONG);
         toast.show();
+        //TODO Migrar esto al fragment de Imagen en pantalla completa cdo este terminado
+        LikesManager likesManager = new LikesManager(this);
+        if(item.liked){
+            likesManager.removeLike(item.id);
+            item.liked = false;
+        } else {
+            likesManager.addLike(item.id);
+            item.liked = true;
+        }
     }
 
     @Override
