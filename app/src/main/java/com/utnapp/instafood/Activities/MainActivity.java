@@ -41,9 +41,11 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.utnapp.instafood.Api.MyCallback;
 import com.utnapp.instafood.CommonUtilities;
 import com.utnapp.instafood.Fragments.ImagesGridFragment;
 import com.utnapp.instafood.Fragments.PublishFragment;
+import com.utnapp.instafood.Managers.PublicationsManager;
 import com.utnapp.instafood.Models.Publication;
 import com.utnapp.instafood.R;
 
@@ -89,6 +91,9 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        PublicationsManager m = new PublicationsManager(this);
+        //m.deleteFeeds();
 
         checkLocationPermissions();
 

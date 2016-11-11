@@ -154,4 +154,27 @@ public class PublicationsManager {
 
         api.executeAsyncCall(request, false, callback);
     }
+
+    public void deleteFeeds() {
+        String relativeUrl = "feeds";
+
+        Request request = api.getDeleteRequest("", relativeUrl, false);
+
+        api.executeAsyncCall(request, false, new MyCallback() {
+            @Override
+            public void success(String responseBody) {
+
+            }
+
+            @Override
+            public void error(String responseBody) {
+
+            }
+
+            @Override
+            public void unhandledError(Exception e) {
+
+            }
+        });
+    }
 }
