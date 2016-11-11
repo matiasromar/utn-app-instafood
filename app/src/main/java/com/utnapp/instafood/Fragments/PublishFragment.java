@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 public class PublishFragment extends Fragment {
+    private static final String ARG_PARAM_CITY = "CITY";
     private OnFragmentInteractionListener mListener;
 
     private static final String SAVED_SELECTED_IMAGE_KEY = "SAVED_SELECTED_IMAGE_KEY";
@@ -49,9 +50,10 @@ public class PublishFragment extends Fragment {
     }
 
 
-    public static PublishFragment newInstance() {
+    public static PublishFragment newInstance(String city) {
         PublishFragment fragment = new PublishFragment();
         Bundle args = new Bundle();
+        args.putString(ARG_PARAM_CITY, city);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,6 +61,10 @@ public class PublishFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (getArguments() != null) {
+            city = getArguments().getString(ARG_PARAM_CITY);
+        }
 
         if (!storagePermissionsGranted && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -270,10 +276,6 @@ public class PublishFragment extends Fragment {
         } else {
             Toast.makeText(getActivity(), R.string.error_capturing_picture, Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public void updateCity(String city) {
-        this.city = city;
     }
 
     public interface OnFragmentInteractionListener {
