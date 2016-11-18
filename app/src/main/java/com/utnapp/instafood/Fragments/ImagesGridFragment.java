@@ -1,8 +1,6 @@
 package com.utnapp.instafood.Fragments;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -67,11 +65,6 @@ public class ImagesGridFragment extends Fragment {
 
         if (getArguments() != null) {
             viewType = getArguments().getString(ARG_PARAM_VIEW);
-            
-            if(!viewType.equals(VIEW_MIS_PUBLICACIONES) && !viewType.equals(VIEW_FEEDS)){
-                Toast.makeText(getActivity(), "Ha ocurrido un error", Toast.LENGTH_LONG).show();
-                return;
-            }
             city = getArguments().getString(ARG_PARAM_CITY);
         }
     }
@@ -98,22 +91,13 @@ public class ImagesGridFragment extends Fragment {
     public void toggleView() {
         if(viewType.equals(VIEW_MIS_PUBLICACIONES)){
             viewType = VIEW_FEEDS;
-            mListener.changeTitle(VIEW_FEEDS);
         } else {
             viewType = VIEW_MIS_PUBLICACIONES;
-            mListener.changeTitle(VIEW_MIS_PUBLICACIONES);
         }
         getUpdatedContent();
     }
 
-    public void UpdateContent(String view) {
-        if(view.equals(VIEW_MIS_PUBLICACIONES)){
-            viewType = VIEW_MIS_PUBLICACIONES;
-            mListener.changeTitle(VIEW_MIS_PUBLICACIONES);
-        } else {
-            viewType = VIEW_FEEDS;
-            mListener.changeTitle(VIEW_FEEDS);
-        }
+    public void UpdateContent() {
         getUpdatedContent();
     }
 
@@ -122,8 +106,9 @@ public class ImagesGridFragment extends Fragment {
         void showAddView(View view);
         void toggleView(View view);
         void hideLoadingIcon();
-        void showLoadingIcon();
+        void showLoadingIcon(String message);
         void changeTitle(String viewTitle);
+        boolean isInternetAvailable();
     }
 
     private void configureView() {
@@ -154,8 +139,8 @@ public class ImagesGridFragment extends Fragment {
         UIgridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 Publication item = (Publication) parent.getItemAtPosition(position);
-                mListener.showPublication(item, viewType == VIEW_FEEDS);
-                if(viewType == VIEW_FEEDS){
+                mListener.showPublication(item, viewType.equals(VIEW_FEEDS));
+                if(viewType.equals(VIEW_FEEDS)){
                     if(v.findViewById(R.id.like).getVisibility() == View.VISIBLE){
                         v.findViewById(R.id.like).setVisibility(View.GONE);
                     } else {
@@ -167,13 +152,23 @@ public class ImagesGridFragment extends Fragment {
     }
 
     private void getUpdatedContent() {
-        mListener.showLoadingIcon();
         final PublicationsManager publicationsManager = new PublicationsManager(getActivity());
+        if(!mListener.isInternetAvailable()){
+            if(viewType.equals(VIEW_FEEDS)){
+                Toast.makeText(getActivity(), "No se pueden mostrar los feeds sin conexión a internet.", Toast.LENGTH_SHORT).show();
+            }
+            viewType = VIEW_MIS_PUBLICACIONES;
+        }
+
         if(viewType.endsWith(VIEW_MIS_PUBLICACIONES)){
+            mListener.showLoadingIcon("Cargando Publicaciones...");
+            mListener.changeTitle(VIEW_MIS_PUBLICACIONES);
             content = publicationsManager.getLocalImages();
             configureView();
             mListener.hideLoadingIcon();
         } else {
+            mListener.showLoadingIcon("Cargando Feeds...");
+            mListener.changeTitle(VIEW_FEEDS);
             publicationsManager.getFeedsAsync(city, null, new MyCallback() {
                 @Override
                 public void success(String responseBody) {
@@ -185,7 +180,7 @@ public class ImagesGridFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                            showErrorShowingContent();
+                                showErrorShowingFeeds();
                             }
                         });
                         return;
@@ -206,7 +201,7 @@ public class ImagesGridFragment extends Fragment {
                         @Override
                         public void run() {
                         mListener.hideLoadingIcon();
-                        showErrorShowingContent();
+                        showErrorShowingFeeds();
                         }
                     });
                 }
@@ -217,7 +212,7 @@ public class ImagesGridFragment extends Fragment {
                         @Override
                         public void run() {
                         mListener.hideLoadingIcon();
-                        showErrorShowingContent();
+                        showErrorShowingFeeds();
                         }
                     });
                 }
@@ -225,7 +220,7 @@ public class ImagesGridFragment extends Fragment {
         }
     }
 
-    private void showErrorShowingContent() {
+    private void showErrorShowingFeeds() {
         Toast.makeText(getActivity(), "Ha ocurrido un error obteniendo los feeds", Toast.LENGTH_SHORT).show();
         toggleView();
     }

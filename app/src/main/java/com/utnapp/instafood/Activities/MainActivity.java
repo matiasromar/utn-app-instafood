@@ -11,13 +11,17 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -30,6 +34,9 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -63,13 +70,6 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
 
-    private final String locationAccessExplanation = "Instafood necesita conocer tu ubicación para poder agregarla a tus publicaciones y compartirla a personas que estén cerca tuyo, ayudalos a disfrutar a ellos también lo copado que estas comiendo ;)";
-    private final long locationRequestInterval = 10000;
-    private final long locationRequestFastestInterval = 5000;
-    private final int locationRequestPriority = LocationRequest.PRIORITY_LOW_POWER;
-
-    private View UIfragmentContainer;
-
     private ImagesGridFragment imagesGridFragment;
     private PublishFragment publishFragment;
 
@@ -92,20 +92,22 @@ public class MainActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        PublicationsManager m = new PublicationsManager(this);
+        //PublicationsManager m = new PublicationsManager(this);
         //m.deleteFeeds();
 
         checkLocationPermissions();
 
         if (googleApiClient == null) {
+            // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing API.
+            // See https://g.co/AppIndexing/AndroidStudio for more information.
             googleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
-                    .build();
+                    .addApi(AppIndex.API).build();
         }
 
-        if(locationRequest == null){
+        if (locationRequest == null) {
             locationRequest = createLocationRequestAndValidatesSettings();
         }
 
@@ -114,7 +116,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onStart() {
-        if(googleApiClient != null && (currentCity == null || currentCity.isEmpty())){
+        if (googleApiClient != null && (currentCity == null || currentCity.isEmpty())) {
             googleApiClient.connect();
         }
         super.onStart();
@@ -126,9 +128,6 @@ public class MainActivity extends AppCompatActivity
         initLocationUpdates();
 
         configureDrawer();
-
-        //TODO - Para cdo estar logueado o no haga alguna diferencia
-        // imagesGridFragment.UpdateContent(ImagesGridFragment.VIEW_MIS_PUBLICACIONES);
     }
 
     @Override
@@ -141,7 +140,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onStop() {
-        if(googleApiClient.isConnected()){
+        if (googleApiClient.isConnected()) {
             googleApiClient.disconnect();
         }
         super.onStop();
@@ -203,6 +202,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public boolean isInternetAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
     //REGION: Menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -212,7 +218,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+//TODO Por si hay settings contextuales
+//        int id = item.getItemId();
 
 //        if (id == R.id.action_settings) {
 //            Toast.makeText(this, "Settings Pending", Toast.LENGTH_SHORT).show();
@@ -228,8 +235,12 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_login) {
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            MainActivity.this.startActivity(intent);
+            if(this.isInternetAvailable()){
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                MainActivity.this.startActivity(intent);
+            } else  {
+                Toast.makeText(this, "No puede ingresar a su cuenta sin conexión. Reintente más tarde.", Toast.LENGTH_SHORT).show();
+            }
         } else if (id == R.id.nav_logout) {
             SharedPreferences sharedPref = getSharedPreferences(this.getString(R.string.prefKey_UserSharedPreferences), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
@@ -304,8 +315,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void showAddView(View view) {
         if(imagesGridFragment != null){
+            if(!this.isInternetAvailable()){
+                Toast.makeText(this, "No se pueden hacer publicaciones sin conexión a internet.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             publishFragment = PublishFragment.newInstance(currentCity);
-            android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .hide(imagesGridFragment)
                     .commit();
@@ -360,7 +376,7 @@ public class MainActivity extends AppCompatActivity
     public void capturePicture(View view) {
         Intent intent = new Intent(
                 MediaStore.ACTION_IMAGE_CAPTURE);
-        File f = new File(android.os.Environment
+        File f = new File(Environment
                 .getExternalStorageDirectory(), "temp.jpg");
         intent.putExtra(MediaStore.EXTRA_OUTPUT,
                 Uri.fromFile(f));
@@ -383,17 +399,18 @@ public class MainActivity extends AppCompatActivity
                 .remove(publishFragment)
                 .commit();
         publishFragment = null;
+        imagesGridFragment.UpdateContent();
     }
     //END_REGION: PublishFragment.OnFragmentInteractionListener
 
     //REGION - Loading
     @Override
-    public void showLoadingIcon() {
+    public void showLoadingIcon(String message) {
         if(progress == null){
             progress = new ProgressDialog(this);
         }
         progress.setTitle("");
-        progress.setMessage(getString(R.string.loadingMsg));
+        progress.setMessage(message);
         progress.show();
     }
 
@@ -462,6 +479,7 @@ public class MainActivity extends AppCompatActivity
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                String locationAccessExplanation = "Instafood necesita conocer tu ubicación para poder agregarla a tus publicaciones y compartirla a personas que estén cerca tuyo, ayudalos a disfrutar a ellos también lo copado que estas comiendo ;)";
                 Toast.makeText(this, locationAccessExplanation, Toast.LENGTH_LONG).show();
 
                 new Handler().postDelayed(new Runnable() {
@@ -486,8 +504,11 @@ public class MainActivity extends AppCompatActivity
 
     private LocationRequest createLocationRequestAndValidatesSettings() {
         LocationRequest newLocationRequest = new LocationRequest();
+        long locationRequestInterval = 10000;
         newLocationRequest.setInterval(locationRequestInterval);
+        long locationRequestFastestInterval = 5000;
         newLocationRequest.setFastestInterval(locationRequestFastestInterval);
+        int locationRequestPriority = LocationRequest.PRIORITY_LOW_POWER;
         newLocationRequest.setPriority(locationRequestPriority);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(newLocationRequest);
@@ -522,7 +543,7 @@ public class MainActivity extends AppCompatActivity
 
     private void initLocationUpdates() {
         if(googleApiClient != null && googleApiClient.isConnected() && locationRequest != null && locationPermissionsGranted && requestingLocationUpdates){
-            this.showLoadingIcon();
+            this.showLoadingIcon("Obteniendo ubicación...");
             //noinspection MissingPermission
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         }
@@ -537,7 +558,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void enableFeeds() {
-        UIfragmentContainer = findViewById(R.id.fragment_container);
+        View UIfragmentContainer = findViewById(R.id.fragment_container);
         UIfragmentContainer.setVisibility(View.VISIBLE);
         setTitle(ImagesGridFragment.VIEW_FEEDS);
         imagesGridFragment = ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_FEEDS, currentCity);

@@ -142,7 +142,7 @@ public class PublishFragment extends Fragment {
         }
 
         final PublicationsManager publicationsManager = new PublicationsManager(getActivity());
-        mListener.showLoadingIcon();
+        mListener.showLoadingIcon("Publicando...");
         publicationsManager.saveImageAsync(description, city, selectedImage, new MyCallback() {
             @Override
             public void success(String responseBody) {
@@ -286,7 +286,7 @@ public class PublishFragment extends Fragment {
         void selectFromGallery(View view);
         void capturePicture(View view);
         void requestStoragePermissions();
-        void showLoadingIcon();
+        void showLoadingIcon(String message);
         void hideLoadingIcon();
         void finishPublish();
     }
