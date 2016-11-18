@@ -2,6 +2,13 @@
 
 Instafood es una aplicación donde los usuarios podrán compartir fotos de lo que están comiendo con otros usuarios que estén a su alrededor, y a su vez podrán likear esas fotos.
 
+## WORK IN PROGRESS
+
+* Hacer interfaz de tabs para cambiar entre "feeds" y "mis publicaciones"
+* Hacer vista de imágenes "swipeables"
+* Poder poner "Me gusta" a los feeds desde vista swipe
+* Que se muestren los "Me gusta" en la vista swipe de imagenes
+
 ## Comenzando
      
 ### Prerequisitos
