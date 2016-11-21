@@ -1,37 +1,30 @@
 package com.utnapp.instafood.Fragments;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utnapp.instafood.Adapters.ImageGridAdapter;
 import com.utnapp.instafood.Api.MyCallback;
+import com.utnapp.instafood.JsonModels.PublicationJson;
 import com.utnapp.instafood.Managers.PublicationsManager;
 import com.utnapp.instafood.Models.Publication;
-import com.utnapp.instafood.JsonModels.PublicationJson;
 import com.utnapp.instafood.R;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import android.widget.AdapterView.OnItemClickListener;
 
 public class ImagesGridFragment extends Fragment {
     private static final String ARG_PARAM_VIEW = "view";
@@ -47,9 +40,9 @@ public class ImagesGridFragment extends Fragment {
     private ArrayList<Publication> content;
     private View mView;
 
-    private int j=0;
-    private LinearLayout imageLayout;
-    private ImageView imageView;
+    private View mainView;
+    private ViewPager mPager;
+    private PagerAdapter mPagerAdapter;
 
     public ImagesGridFragment() {
     }
@@ -87,6 +80,8 @@ public class ImagesGridFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_images_grid, container, false);
+        mainView = mView.findViewById(R.id.mainView);
+        mPager = (ViewPager) mView.findViewById(R.id.pager);
         getUpdatedContent();
         return mView;
     }
@@ -116,8 +111,17 @@ public class ImagesGridFragment extends Fragment {
         getUpdatedContent();
     }
 
+    public boolean isShowingSlider() {
+        return mPager.getVisibility() == View.VISIBLE;
+    }
+
+    public void closeSlider() {
+        mPager.setVisibility(View.GONE);
+        mainView.setVisibility(View.VISIBLE);
+        mPager.setAdapter(null);
+    }
+
     public interface OnFragmentInteractionListener {
-        void showPublication(Publication item, boolean allowLike);
         void showAddView(View view);
         void toggleView(View view);
         void hideLoadingIcon();
@@ -135,6 +139,7 @@ public class ImagesGridFragment extends Fragment {
             UIgridView.setVisibility(TextView.VISIBLE);
 
             configureGrid(UIgridView);
+            configureSliderView();
         } else {
             UIerrorMsg.setVisibility(TextView.VISIBLE);
             UIgridView.setVisibility(View.GONE);
@@ -153,31 +158,12 @@ public class ImagesGridFragment extends Fragment {
         UIgridView.setAdapter(gridAdapter);
         UIgridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                // necesito saber cual es el array del grid, y sustituir thumb
-                //   zoomImageGrid(v, thumb[position]);
-
-
-                Publication item = (Publication) parent.getItemAtPosition(position);
-                mListener.showPublication(item, viewType.equals(VIEW_FEEDS));
-                if(viewType.equals(VIEW_FEEDS)){
-                    if(v.findViewById(R.id.like).getVisibility() == View.VISIBLE){
-                        v.findViewById(R.id.like).setVisibility(View.GONE);
-                    } else {
-                        v.findViewById(R.id.like).setVisibility(View.VISIBLE);
-                    }
-                }
+                mainView.setVisibility(View.GONE);
+                mPager.setVisibility(View.VISIBLE);
+                mPager.setCurrentItem(position);
             }
         });
     }
-
-    //para probar si es correcto el array, no esta probado pero deberia andar
-    private void zoomImageGrid(final View thumbView, int pos) {
-
-        imageView.setImageResource(pos);
-        imageLayout.setVisibility(View.VISIBLE);
-    }
-
-
 
     private void getUpdatedContent() {
         final PublicationsManager publicationsManager = new PublicationsManager(getActivity());
@@ -248,8 +234,36 @@ public class ImagesGridFragment extends Fragment {
         }
     }
 
+    private void configureSliderView() {
+        mPagerAdapter = new ScreenSlidePagerAdapter(getActivity().getSupportFragmentManager());
+        mPager.setAdapter(mPagerAdapter);
+        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                getActivity().invalidateOptionsMenu();
+            }
+        });
+    }
+
     private void showErrorShowingFeeds() {
         Toast.makeText(getActivity(), "Ha ocurrido un error obteniendo los feeds", Toast.LENGTH_SHORT).show();
         toggleView();
+    }
+
+    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+        public ScreenSlidePagerAdapter(FragmentManager supportFragmentManager) {
+            super(supportFragmentManager);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            Publication publication = content.get(position);
+            return ScreenSlidePagerFragment.create(publication.image, publication.description);
+        }
+
+        @Override
+        public int getCount() {
+            return content.size();
+        }
     }
 }

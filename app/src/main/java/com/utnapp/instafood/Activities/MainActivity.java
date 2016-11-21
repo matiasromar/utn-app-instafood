@@ -34,9 +34,6 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -52,12 +49,12 @@ import com.utnapp.instafood.CommonUtilities;
 import com.utnapp.instafood.Fragments.ImagesGridFragment;
 import com.utnapp.instafood.Fragments.PublishFragment;
 import com.utnapp.instafood.Managers.LikesManager;
-import com.utnapp.instafood.Managers.PublicationsManager;
 import com.utnapp.instafood.Models.Publication;
 import com.utnapp.instafood.R;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -98,13 +95,11 @@ public class MainActivity extends AppCompatActivity
         checkLocationPermissions();
 
         if (googleApiClient == null) {
-            // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing API.
-            // See https://g.co/AppIndexing/AndroidStudio for more information.
             googleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
-                    .addApi(AppIndex.API).build();
+                    .build();
         }
 
         if (locationRequest == null) {
@@ -152,7 +147,11 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if(imagesGridFragment != null && imagesGridFragment.isShowingSlider()){
+                imagesGridFragment.closeSlider();
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -296,22 +295,6 @@ public class MainActivity extends AppCompatActivity
     //END-REGION Location
 
     //REGION: ImagesGridFragment.OnFragmentInteractionListener
-    @Override
-    public void showPublication(Publication item, boolean allowLike) {
-        //TODO showPublication
-        if(allowLike){
-            //TODO Migrar esto al fragment de Imagen en pantalla completa cdo este terminado
-            LikesManager likesManager = new LikesManager(this);
-            if(item.liked){
-                likesManager.removeLike(item.id);
-                item.liked = false;
-            } else {
-                likesManager.addLike(item.id);
-                item.liked = true;
-            }
-        }
-    }
-
     @Override
     public void showAddView(View view) {
         if(imagesGridFragment != null){
@@ -544,11 +527,11 @@ public class MainActivity extends AppCompatActivity
     private void initLocationUpdates() {
         if(googleApiClient != null && googleApiClient.isConnected() && locationRequest != null && locationPermissionsGranted && requestingLocationUpdates){
             //JUAN - PARA PODER EMULAR - NO BORRAR NI MODIFICAR
-//            this.showLoadingIcon("Obteniendo ubicación...");
-//            //noinspection MissingPermission
-//            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
-            currentCity = "TESTING";
-            googleApiClient.disconnect();
+            this.showLoadingIcon("Obteniendo ubicación...");
+            //noinspection MissingPermission
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+//            currentCity = "TESTING";
+//            googleApiClient.disconnect();
             enableFeeds();
             //JUAN - FIN - PARA PODER EMULAR - NO BORRAR NI MODIFICAR
         }
