@@ -532,7 +532,7 @@ public class MainActivity extends AppCompatActivity
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
 //            currentCity = "TESTING";
 //            googleApiClient.disconnect();
-            enableFeeds();
+//            enableFeeds();
             //JUAN - FIN - PARA PODER EMULAR - NO BORRAR NI MODIFICAR
         }
     }
