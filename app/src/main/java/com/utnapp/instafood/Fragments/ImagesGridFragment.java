@@ -1,13 +1,23 @@
 package com.utnapp.instafood.Fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +31,7 @@ import com.utnapp.instafood.R;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class ImagesGridFragment extends Fragment {
     private static final String ARG_PARAM_VIEW = "view";
@@ -35,6 +46,10 @@ public class ImagesGridFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private ArrayList<Publication> content;
     private View mView;
+
+    private int j=0;
+    private LinearLayout imageLayout;
+    private ImageView imageView;
 
     public ImagesGridFragment() {
     }
@@ -138,6 +153,10 @@ public class ImagesGridFragment extends Fragment {
         UIgridView.setAdapter(gridAdapter);
         UIgridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                // necesito saber cual es el array del grid, y sustituir thumb
+                //   zoomImageGrid(v, thumb[position]);
+
+
                 Publication item = (Publication) parent.getItemAtPosition(position);
                 mListener.showPublication(item, viewType.equals(VIEW_FEEDS));
                 if(viewType.equals(VIEW_FEEDS)){
@@ -150,6 +169,15 @@ public class ImagesGridFragment extends Fragment {
             }
         });
     }
+
+    //para probar si es correcto el array, no esta probado pero deberia andar
+    private void zoomImageGrid(final View thumbView, int pos) {
+
+        imageView.setImageResource(pos);
+        imageLayout.setVisibility(View.VISIBLE);
+    }
+
+
 
     private void getUpdatedContent() {
         final PublicationsManager publicationsManager = new PublicationsManager(getActivity());
