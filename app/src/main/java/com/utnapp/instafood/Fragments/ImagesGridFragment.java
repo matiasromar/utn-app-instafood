@@ -119,6 +119,7 @@ public class ImagesGridFragment extends Fragment {
         mPager.setVisibility(View.GONE);
         mainView.setVisibility(View.VISIBLE);
         mPager.setAdapter(null);
+        getUpdatedContent();
     }
 
     public interface OnFragmentInteractionListener {
@@ -258,7 +259,7 @@ public class ImagesGridFragment extends Fragment {
         @Override
         public Fragment getItem(int position) {
             Publication publication = content.get(position);
-            return ScreenSlidePagerFragment.create(publication.image, publication.description);
+            return ScreenSlidePagerFragment.create(publication);
         }
 
         @Override

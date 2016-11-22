@@ -527,12 +527,12 @@ public class MainActivity extends AppCompatActivity
     private void initLocationUpdates() {
         if(googleApiClient != null && googleApiClient.isConnected() && locationRequest != null && locationPermissionsGranted && requestingLocationUpdates){
             //JUAN - PARA PODER EMULAR - NO BORRAR NI MODIFICAR
-            this.showLoadingIcon("Obteniendo ubicación...");
+            //this.showLoadingIcon("Obteniendo ubicación...");
             //noinspection MissingPermission
-            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
-//            currentCity = "TESTING";
-//            googleApiClient.disconnect();
-//            enableFeeds();
+            //LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+            currentCity = "TESTING";
+            googleApiClient.disconnect();
+            enableFeeds();
             //JUAN - FIN - PARA PODER EMULAR - NO BORRAR NI MODIFICAR
         }
     }
