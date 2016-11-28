@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -47,14 +48,13 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.utnapp.instafood.CommonUtilities;
 import com.utnapp.instafood.Fragments.ImagesGridFragment;
+import com.utnapp.instafood.Adapters.ContentFragmentAdapter;
 import com.utnapp.instafood.Fragments.PublishFragment;
-import com.utnapp.instafood.Managers.LikesManager;
-import com.utnapp.instafood.Models.Publication;
 import com.utnapp.instafood.R;
+import com.utnapp.instafood.SlidingTab.SlidingTabLayout;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -89,6 +89,8 @@ public class MainActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        setTabs(2);
+
         //PublicationsManager m = new PublicationsManager(this);
         //m.deleteFeeds();
 
@@ -107,6 +109,18 @@ public class MainActivity extends AppCompatActivity
         }
 
         configureDrawer();
+    }
+
+    //TODO new tabs
+    public void setTabs(int count) {
+        ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
+        ContentFragmentAdapter adapterViewPager = new ContentFragmentAdapter(getSupportFragmentManager(), this, count);
+        vpPager.setAdapter(adapterViewPager);
+
+        SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        slidingTabLayout.setDistributeEvenly();
+        slidingTabLayout.setViewPager(vpPager);
+        slidingTabLayout.setTabSelected(0);
     }
 
     @Override
