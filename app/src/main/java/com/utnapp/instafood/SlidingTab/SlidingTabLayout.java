@@ -16,10 +16,6 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-/**
- * Created by mromar on 11/28/16.
- */
-
 public class SlidingTabLayout extends  HorizontalScrollView{
 
     public interface TabColorizer {
@@ -33,8 +29,8 @@ public class SlidingTabLayout extends  HorizontalScrollView{
     private int mTabViewLayoutId;
     private int mTabViewTextViewId;
     private boolean mDistributeEvenly;
-    private int textColor = Color.WHITE;
-    private int textColorSelected = Color.GRAY;
+    private int textColor = Color.LTGRAY;
+    private int textColorSelected = Color.WHITE;
     private ViewPager mViewPager;
     private SparseArray<String> mContentDescriptions = new SparseArray<>();
     private ViewPager.OnPageChangeListener mViewPagerPageChangeListener;

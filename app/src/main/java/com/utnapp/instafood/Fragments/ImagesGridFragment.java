@@ -98,15 +98,6 @@ public class ImagesGridFragment extends Fragment {
         mListener = null;
     }
 
-    public void toggleView() {
-        if(viewType.equals(VIEW_MIS_PUBLICACIONES)){
-            viewType = VIEW_FEEDS;
-        } else {
-            viewType = VIEW_MIS_PUBLICACIONES;
-        }
-        getUpdatedContent();
-    }
-
     public void UpdateContent() {
         getUpdatedContent();
     }
@@ -124,10 +115,8 @@ public class ImagesGridFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         void showAddView(View view);
-        void toggleView(View view);
         void hideLoadingIcon();
         void showLoadingIcon(String message);
-        void changeTitle(String viewTitle);
         boolean isInternetAvailable();
     }
 
@@ -177,13 +166,11 @@ public class ImagesGridFragment extends Fragment {
 
         if(viewType.endsWith(VIEW_MIS_PUBLICACIONES)){
             mListener.showLoadingIcon("Cargando Publicaciones...");
-            mListener.changeTitle(VIEW_MIS_PUBLICACIONES);
             content = publicationsManager.getLocalImages();
             configureView();
             mListener.hideLoadingIcon();
         } else {
             mListener.showLoadingIcon("Cargando Feeds...");
-            mListener.changeTitle(VIEW_FEEDS);
             publicationsManager.getFeedsAsync(city, null, new MyCallback() {
                 @Override
                 public void success(String responseBody) {
@@ -237,18 +224,19 @@ public class ImagesGridFragment extends Fragment {
 
     private void configureSliderView() {
         mPagerAdapter = new ScreenSlidePagerAdapter(getActivity().getSupportFragmentManager());
-        mPager.setAdapter(mPagerAdapter);
-        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                getActivity().invalidateOptionsMenu();
-            }
-        });
+        if(mPager.getAdapter() == null){
+            mPager.setAdapter(mPagerAdapter);
+            mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+                @Override
+                public void onPageSelected(int position) {
+                    getActivity().invalidateOptionsMenu();
+                }
+            });
+        }
     }
 
     private void showErrorShowingFeeds() {
         Toast.makeText(getActivity(), "Ha ocurrido un error obteniendo los feeds", Toast.LENGTH_SHORT).show();
-        toggleView();
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

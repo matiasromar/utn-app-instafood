@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -67,7 +68,6 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
 
-    private ImagesGridFragment imagesGridFragment;
     private PublishFragment publishFragment;
 
     private ProgressDialog progress;
@@ -82,14 +82,20 @@ public class MainActivity extends AppCompatActivity
 
     private String currentCity;
 
+    ContentFragmentAdapter adapterViewPager;
+
+    View fragmentContainer;
+    ViewPager vpPager;
+    SlidingTabLayout slidingTabLayout;
+    private ViewPager mPager;
+    private PagerAdapter mPagerAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        setTabs(2);
 
         //PublicationsManager m = new PublicationsManager(this);
         //m.deleteFeeds();
@@ -109,18 +115,11 @@ public class MainActivity extends AppCompatActivity
         }
 
         configureDrawer();
-    }
 
-    //TODO new tabs
-    public void setTabs(int count) {
-        ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
-        ContentFragmentAdapter adapterViewPager = new ContentFragmentAdapter(getSupportFragmentManager(), this, count);
-        vpPager.setAdapter(adapterViewPager);
-
-        SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
-        slidingTabLayout.setDistributeEvenly();
-        slidingTabLayout.setViewPager(vpPager);
-        slidingTabLayout.setTabSelected(0);
+        fragmentContainer = findViewById(R.id.fragment_container);
+        vpPager = (ViewPager) findViewById(R.id.vpPager);
+        slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        mPager = (ViewPager) findViewById(R.id.pager);
     }
 
     @Override
@@ -161,8 +160,8 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if(imagesGridFragment != null && imagesGridFragment.isShowingSlider()){
-                imagesGridFragment.closeSlider();
+            if(adapterViewPager != null && adapterViewPager.isShowingSlider()){
+                adapterViewPager.closeSlider();
             } else {
                 super.onBackPressed();
             }
@@ -311,35 +310,23 @@ public class MainActivity extends AppCompatActivity
     //REGION: ImagesGridFragment.OnFragmentInteractionListener
     @Override
     public void showAddView(View view) {
-        if(imagesGridFragment != null){
+        if(adapterViewPager != null){
             if(!this.isInternetAvailable()){
                 Toast.makeText(this, "No se pueden hacer publicaciones sin conexión a internet.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            slidingTabLayout.setVisibility(View.GONE);
+            vpPager.setVisibility(View.GONE);
+            fragmentContainer.setVisibility(View.VISIBLE);
+
             publishFragment = PublishFragment.newInstance(currentCity);
             FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .hide(imagesGridFragment)
-                    .commit();
-
             fragmentManager.beginTransaction()
                     .add(R.id.fragment_container, publishFragment)
                     .addToBackStack(null)
                     .commit();
         }
-    }
-
-    @Override
-    public void toggleView(View view) {
-        if(imagesGridFragment != null){
-            imagesGridFragment.toggleView();
-        }
-    }
-
-    @Override
-    public void changeTitle(String viewTitle) {
-        setTitle(viewTitle);
     }
     //END_REGION: ImagesGridFragment.OnFragmentInteractionListener
 
@@ -391,12 +378,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void finishPublish() {
-        getSupportFragmentManager().beginTransaction()
-                .show(imagesGridFragment)
-                .remove(publishFragment)
-                .commit();
         publishFragment = null;
-        imagesGridFragment.UpdateContent();
+        adapterViewPager.UpdateContent();
+
+        slidingTabLayout.setVisibility(View.VISIBLE);
+        vpPager.setVisibility(View.VISIBLE);
+        fragmentContainer.setVisibility(View.GONE);
     }
     //END_REGION: PublishFragment.OnFragmentInteractionListener
 
@@ -560,10 +547,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void enableFeeds() {
-        View UIfragmentContainer = findViewById(R.id.fragment_container);
-        UIfragmentContainer.setVisibility(View.VISIBLE);
-        setTitle(ImagesGridFragment.VIEW_FEEDS);
-        imagesGridFragment = ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_FEEDS, currentCity);
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, imagesGridFragment).commitAllowingStateLoss();
+        adapterViewPager = new ContentFragmentAdapter(getSupportFragmentManager(), this, currentCity);
+        vpPager.setAdapter(adapterViewPager);
+
+        slidingTabLayout.setDistributeEvenly();
+        slidingTabLayout.setViewPager(vpPager);
+        slidingTabLayout.setTabSelected(0);
     }
 }

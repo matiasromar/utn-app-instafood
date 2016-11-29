@@ -7,37 +7,65 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.utnapp.instafood.Fragments.ImagesGridFragment;
 
-/**
- * Created by mromar on 11/28/16.
- */
-
 public class ContentFragmentAdapter extends FragmentPagerAdapter {
     private static int NUM_ITEMS = 1;
     private final Context c;
+
+    private final ImagesGridFragment feeds;
+    private final ImagesGridFragment misPublicaciones;
+
     private String currentCity;
 
-    public ContentFragmentAdapter(FragmentManager fragmentManager, Context context, int item_count) {
+    public ContentFragmentAdapter(FragmentManager fragmentManager, Context context, String currentCity) {
         super(fragmentManager);
-        NUM_ITEMS = item_count;
+        NUM_ITEMS = 2;
+        this.currentCity = currentCity;
         c = context;
+
+        feeds = ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_FEEDS, currentCity);
+        misPublicaciones = ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_MIS_PUBLICACIONES, currentCity);
     }
 
-    // Returns total number of pages
     @Override
     public int getCount() {
         return NUM_ITEMS;
     }
 
-    // Returns the fragment to display for that page
     @Override
     public Fragment getItem(int position) {
-        return ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_FEEDS, currentCity);
+       if(position == 1) {
+           return misPublicaciones;
+        } else {
+           return feeds;
+       }
     }
 
-    // Returns the page title for the top indicator
     @Override
     public CharSequence getPageTitle(int position) {
-        return "Tab " + String.valueOf(position + 1);
+        if(position == 1) {
+            return "Mis Publicaciones";
+        } else {
+            return "FEEDS";
+        }
+    }
+
+    public void UpdateContent() {
+        feeds.UpdateContent();
+        misPublicaciones.UpdateContent();
+    }
+
+    public void closeSlider() {
+        if(feeds.isShowingSlider()){
+            feeds.closeSlider();
+        } else {
+            if(misPublicaciones.isShowingSlider()){
+                misPublicaciones.closeSlider();
+            }
+        }
+    }
+
+    public boolean isShowingSlider() {
+        return feeds.isShowingSlider() || misPublicaciones.isShowingSlider();
     }
 }
 
