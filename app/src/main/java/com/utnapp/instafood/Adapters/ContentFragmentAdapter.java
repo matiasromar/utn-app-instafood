@@ -5,25 +5,21 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.utnapp.instafood.Fragments.ImagesGridFragment;
+import com.utnapp.instafood.Fragments.FeedsGridFragment;
+import com.utnapp.instafood.Fragments.MisPublicacionesGridFragment;
 
 public class ContentFragmentAdapter extends FragmentPagerAdapter {
     private static int NUM_ITEMS = 1;
-    private final Context c;
 
-    private final ImagesGridFragment feeds;
-    private final ImagesGridFragment misPublicaciones;
-
-    private String currentCity;
+    private final FeedsGridFragment feeds;
+    private final MisPublicacionesGridFragment misPublicaciones;
 
     public ContentFragmentAdapter(FragmentManager fragmentManager, Context context, String currentCity) {
         super(fragmentManager);
         NUM_ITEMS = 2;
-        this.currentCity = currentCity;
-        c = context;
 
-        feeds = ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_FEEDS, currentCity);
-        misPublicaciones = ImagesGridFragment.newInstance(ImagesGridFragment.VIEW_MIS_PUBLICACIONES, currentCity);
+        feeds = FeedsGridFragment.newInstance(currentCity);
+        misPublicaciones = MisPublicacionesGridFragment.newInstance();
     }
 
     @Override
@@ -52,20 +48,6 @@ public class ContentFragmentAdapter extends FragmentPagerAdapter {
     public void UpdateContent() {
         feeds.UpdateContent();
         misPublicaciones.UpdateContent();
-    }
-
-    public void closeSlider() {
-        if(feeds.isShowingSlider()){
-            feeds.closeSlider();
-        } else {
-            if(misPublicaciones.isShowingSlider()){
-                misPublicaciones.closeSlider();
-            }
-        }
-    }
-
-    public boolean isShowingSlider() {
-        return feeds.isShowingSlider() || misPublicaciones.isShowingSlider();
     }
 }
 

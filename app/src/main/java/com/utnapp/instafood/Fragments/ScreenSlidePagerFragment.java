@@ -54,27 +54,31 @@ public class ScreenSlidePagerFragment extends Fragment {
         UIlocation.setText(item.city);
 
         final FloatingActionButton favBtn = (FloatingActionButton) rootView.findViewById(R.id.favBtn);
-        if(item.liked){
-            favBtn.setColorFilter(ContextCompat.getColor(getContext(), R.color.black));
+        if(item.id == null){
+            favBtn.setVisibility(View.GONE);
         } else {
-            favBtn.setColorFilter(ContextCompat.getColor(getContext(), R.color.white));
-        }
-
-        favBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LikesManager likesManager = new LikesManager(getActivity());
-                if(item.liked){
-                    favBtn.setColorFilter(ContextCompat.getColor(getContext(), R.color.white));
-                    likesManager.removeLike(item.id);
-                    item.liked = false;
-                } else {
-                    favBtn.setColorFilter(ContextCompat.getColor(getContext(), R.color.black));
-                    likesManager.addLike(item.id);
-                    item.liked = true;
-                }
+            if(item.liked){
+                favBtn.setColorFilter(ContextCompat.getColor(getContext(), R.color.black));
+            } else {
+                favBtn.setColorFilter(ContextCompat.getColor(getContext(), R.color.white));
             }
-        });
+
+            favBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    LikesManager likesManager = new LikesManager(getActivity());
+                    if(item.liked){
+                        favBtn.setColorFilter(ContextCompat.getColor(getContext(), R.color.white));
+                        likesManager.removeLike(item.id);
+                        item.liked = false;
+                    } else {
+                        favBtn.setColorFilter(ContextCompat.getColor(getContext(), R.color.black));
+                        likesManager.addLike(item.id);
+                        item.liked = true;
+                    }
+                }
+            });
+        }
 
         return rootView;
     }

@@ -22,7 +22,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -47,20 +46,25 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.utnapp.instafood.Adapters.ScreenSlidePagerAdapter;
 import com.utnapp.instafood.CommonUtilities;
-import com.utnapp.instafood.Fragments.ImagesGridFragment;
+import com.utnapp.instafood.Fragments.FeedsGridFragment;
 import com.utnapp.instafood.Adapters.ContentFragmentAdapter;
+import com.utnapp.instafood.Fragments.MisPublicacionesGridFragment;
 import com.utnapp.instafood.Fragments.PublishFragment;
+import com.utnapp.instafood.Managers.PublicationsManager;
+import com.utnapp.instafood.Models.Publication;
 import com.utnapp.instafood.R;
 import com.utnapp.instafood.SlidingTab.SlidingTabLayout;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ImagesGridFragment.OnFragmentInteractionListener, PublishFragment.OnFragmentInteractionListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+        implements NavigationView.OnNavigationItemSelectedListener, MisPublicacionesGridFragment.OnFragmentInteractionListener, FeedsGridFragment.OnFragmentInteractionListener, PublishFragment.OnFragmentInteractionListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private boolean requestingLocationUpdates = false;
     private boolean locationPermissionsGranted = false;
@@ -88,7 +92,7 @@ public class MainActivity extends AppCompatActivity
     ViewPager vpPager;
     SlidingTabLayout slidingTabLayout;
     private ViewPager mPager;
-    private PagerAdapter mPagerAdapter;
+    private int loadingCounter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,8 +101,8 @@ public class MainActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //PublicationsManager m = new PublicationsManager(this);
-        //m.deleteFeeds();
+//        PublicationsManager m = new PublicationsManager(this);
+//        m.deleteFeeds();
 
         checkLocationPermissions();
 
@@ -119,7 +123,6 @@ public class MainActivity extends AppCompatActivity
         fragmentContainer = findViewById(R.id.fragment_container);
         vpPager = (ViewPager) findViewById(R.id.vpPager);
         slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
-        mPager = (ViewPager) findViewById(R.id.pager);
     }
 
     @Override
@@ -160,8 +163,11 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if(adapterViewPager != null && adapterViewPager.isShowingSlider()){
-                adapterViewPager.closeSlider();
+            if(mPager != null && mPager.getVisibility() == View.VISIBLE){
+                mPager.setVisibility(View.GONE);
+                slidingTabLayout.setVisibility(View.VISIBLE);
+                vpPager.setVisibility(View.VISIBLE);
+                adapterViewPager.UpdateContent();
             } else {
                 super.onBackPressed();
             }
@@ -307,7 +313,24 @@ public class MainActivity extends AppCompatActivity
     }
     //END-REGION Location
 
-    //REGION: ImagesGridFragment.OnFragmentInteractionListener
+    //REGION: FeedsGridFragment.OnFragmentInteractionListener
+    @Override
+    public void showSlider(ArrayList<Publication> content, int position) {
+        slidingTabLayout.setVisibility(View.GONE);
+        vpPager.setVisibility(View.GONE);
+        ScreenSlidePagerAdapter mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), content);
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager.setAdapter(mPagerAdapter);
+        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                MainActivity.this.invalidateOptionsMenu();
+            }
+        });
+        mPager.setVisibility(View.VISIBLE);
+        mPager.setCurrentItem(position);
+    }
+
     @Override
     public void showAddView(View view) {
         if(adapterViewPager != null){
@@ -328,7 +351,7 @@ public class MainActivity extends AppCompatActivity
                     .commit();
         }
     }
-    //END_REGION: ImagesGridFragment.OnFragmentInteractionListener
+    //END_REGION: FeedsGridFragment.OnFragmentInteractionListener
 
     //REGION: PublishFragment.OnFragmentInteractionListener
     @Override
@@ -378,12 +401,17 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void finishPublish() {
-        publishFragment = null;
         adapterViewPager.UpdateContent();
 
         slidingTabLayout.setVisibility(View.VISIBLE);
         vpPager.setVisibility(View.VISIBLE);
         fragmentContainer.setVisibility(View.GONE);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .remove(publishFragment)
+                .commit();
+        publishFragment = null;
     }
     //END_REGION: PublishFragment.OnFragmentInteractionListener
 
@@ -396,11 +424,15 @@ public class MainActivity extends AppCompatActivity
         progress.setTitle("");
         progress.setMessage(message);
         progress.show();
+        loadingCounter++;
     }
 
     @Override
     public void hideLoadingIcon() {
-        if(progress != null){
+        if(loadingCounter != 0){
+            loadingCounter--;
+        }
+        if(progress != null && loadingCounter == 0){
             progress.dismiss();
         }
     }
@@ -528,12 +560,12 @@ public class MainActivity extends AppCompatActivity
     private void initLocationUpdates() {
         if(googleApiClient != null && googleApiClient.isConnected() && locationRequest != null && locationPermissionsGranted && requestingLocationUpdates){
             //JUAN - PARA PODER EMULAR - NO BORRAR NI MODIFICAR
-            //this.showLoadingIcon("Obteniendo ubicación...");
+            this.showLoadingIcon("Obteniendo ubicación...");
             //noinspection MissingPermission
-            //LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
-            currentCity = "TESTING";
-            googleApiClient.disconnect();
-            enableFeeds();
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+            //currentCity = "TESTING";
+            //googleApiClient.disconnect();
+            //enableFeeds();
             //JUAN - FIN - PARA PODER EMULAR - NO BORRAR NI MODIFICAR
         }
     }
